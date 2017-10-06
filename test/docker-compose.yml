@@ -18,5 +18,4 @@ services:
     ports:
       - "8888:8888"
     container_name: jupyter
-    stop_grace_period: 30s
     restart: "no"
