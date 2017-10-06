@@ -1,0 +1,7 @@
+.built
+.developed
+.server
+.staged
+.released
+*.pyc
+.DS_Store

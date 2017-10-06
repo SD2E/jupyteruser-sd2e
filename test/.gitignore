@@ -1,0 +1,4 @@
+notebook.pem
+.DS_Store
+*.pyc
+tmp/
