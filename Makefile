@@ -82,3 +82,7 @@ clean: clean-files server-stop
 .SILENT: distclean
 distclean: clean clean-images
 
+.SILENT: info
+info: 
+	echo "image: $(TACC_DOCKER_ORG)/$(TACC_DOCKER_REPO)" ; \
+	echo "tags:\n - local: $(LOCAL_TAG)\n - staging: $(STAGING_TAG)\n - release: $(RELEASE_TAG)"
