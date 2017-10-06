@@ -28,7 +28,8 @@ make develop && make tests
 
 # test locally at http://localhost:8888/
 
-make release
+make release && make pristine
 ```
 
-Test and validate at https://jupyter-dot-sd2e-dot.org/
+Test and validate at https://jupyter-dot-sd2e-dot.org/. In the source repository, update the [change log](./CHANGELOG.md) and any documenation. Push back up to `master`.
+
