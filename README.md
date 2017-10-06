@@ -8,7 +8,3 @@ Via a combination of the repository itself plus GitHub's collaborative issue man
 
 The process for community contributions is outlined in [CONTRIBUTING](./CONTRIBUTING.md). Critical guidelines for the maintainers of this repo and the SD2E Jupyter are in [MAINTAINERS](./MAINTAINERS.md). 
 
-### Other Licenses
-
-* JupyterHub and Jupyter Notebooks are NNNN
-* 
