@@ -28,7 +28,7 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-NOTICE. Portions of this Software was developed under funding from the U.S.
+NOTICE. Portions of this Software were developed under funding from the U.S.
 Defense Advanced Research Projects Agency and the U.S. Government
 consequently retains certain rights. As such, the U.S. Government has been
 granted for itself and others acting on its behalf a paid-up, nonexclusive,
