@@ -72,9 +72,9 @@ clean-files:
 
 .SILENT: clean-images
 clean-images:
-	docker rmi -f "$(TENANT_DOCKER_REPO)$(LOCAL_TAG)" ; \
-	docker rmi -f "$(TENANT_DOCKER_ORG)/$(TENANT_DOCKER_REPO)$(STAGING_TAG)" ; \
-	docker rmi -f "$(TACC_DOCKER_ORG)/$(TENANT_DOCKER_REPO)$(RELEASE_TAG)" ; \
+	docker rmi -f "$(TACC_DOCKER_REPO)$(LOCAL_TAG)" ; \
+	docker rmi -f "$(TACC_DOCKER_ORG)/$(TACC_DOCKER_REPO)$(STAGING_TAG)" ; \
+	docker rmi -f "$(TACC_DOCKER_ORG)/$(TACC_DOCKER_REPO)$(RELEASE_TAG)" ; \
 
 .SILENT: clean
 clean: clean-files server-stop
