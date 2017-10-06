@@ -41,7 +41,7 @@ staging: tests
 	echo "$(TACC_DOCKER_ORG)/$(TACC_DOCKER_REPO)$(STAGING_TAG) released"
 
 .SILENT: release
-release: .staged
+release:
 	build/images.sh "$(TACC_DOCKER_ORG)" build $(RELEASE_TAG) ; \
 	build/docker.sh "$(TACC_DOCKER_ORG)/$(TACC_DOCKER_REPO)" "Dockerfile" release $(RELEASE_TAG) ; \
 	touch .released ; \
