@@ -5,10 +5,12 @@ DOCKERFILE=$2
 COMMAND=$3
 TAG=$4
 
+echo "#########################"
 echo "cmd: $COMMAND"
 echo "image: $REPO"
 echo "tag: $TAG"
 echo "dockerfile: $DOCKERFILE"
+echo "========================="
 
 function die {
 
@@ -23,7 +25,7 @@ if [ $? -ne 0 ] ; then die "Docker not found or unreachable. Exiting." ; fi
 if [[ "$COMMAND" == "build" ]];
 then
 
-    docker build --rm=true -t ${REPO}${TAG} -f ${DOCKERFILE} .
+    docker build --force-rm --rm=true -t ${REPO}${TAG} -f ${DOCKERFILE} .
     if [ $? -ne 0 ] ; then die "Error on build. Exiting." ; fi
 
     IMAGEID=`docker images -q  ${REPO}${TAG}`

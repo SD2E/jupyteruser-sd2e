@@ -21,8 +21,8 @@ help:
 	echo "You can make: develop, tests, staging, release, clean, distclean"
 
 .SILENT: develop
-develop:
-	build/images.sh "$(TACC_DOCKER_ORG)" build $(LOCAL_TAG) ; \
+develop: .built
+	build/images.sh "$(TENANT_DOCKER_ORG)" build $(LOCAL_TAG) ; \
 	touch .built ; \
 	echo "Built. Now run 'make tests'."
 
@@ -31,7 +31,7 @@ tests: .built
 	cd test ; \
 	docker-compose up -d ; \
 	echo "Go to http://localhost:8888/ to test" ; \
-	touch .tested
+	touch ../.tested
 
 .SILENT: staging
 staging: tests

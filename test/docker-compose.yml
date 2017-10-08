@@ -9,14 +9,14 @@ services:
     environment:
       - PASSWORD=
       - JPY_USER=$USER
-    image: taccsciapps/jupyteruser-sd2e:devel
+    image: sd2e/jupyteruser-sd2e:devel
     command: ["start-notebook.sh"]
     volumes:
-      - ./jupyter-local-conf.py:/home/jupyter/.jupyter/jupyter_notebook_config.py:ro
       - ./work:/home/jupyter/mydata:rw
+      - ./dotjupyter:/home/jupyter/.jupyter:rw
+      - ./dotjupyter/jupyter-local-conf.py:/home/jupyter/.jupyter/jupyter_notebook_config.py:rw
       - ~/.agave/current:/home/jupyter/.agave/current:rw
     ports:
       - "8888:8888"
     container_name: jupyter
-    stop_grace_period: 30s
     restart: "no"
