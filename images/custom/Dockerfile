@@ -2,11 +2,15 @@ FROM sd2e/jupyteruser-base:devel
 
 USER root
 LABEL "comment"="Support for plotly igraph and networkx" "issue"="SD2E/jupyteruser-sd2e/issues/3"
+# Py3
 RUN pip install python-igraph plotly networkx
-
+# Py2
+RUN /bin/bash -c "source activate python2 && \
+    pip install python-igraph plotly networkx"
 
 USER root
 LABEL "comment"="Support for Open Probabilistic Programming Stack" "issue"="SD2E/jupyteruser-sd2e/issues/2"
+# Py2
 RUN apt-get update && \
     apt-get install -y libboost-all-dev libgsl0-dev ccache && \
     apt-get clean
@@ -24,6 +28,14 @@ RUN /bin/bash -c "source activate python2 && \
 ADD ./examples/probcomp /home/jupyter/examples/probcomp
 RUN chown -R jupyter:G-818301 /home/jupyter/examples/probcomp
 RUN chmod -R a+rwX /home/jupyter/examples/probcomp
+
+USER root
+LABEL "comment"="Enable Bokeh"
+# Py3
+RUN pip install bokeh 
+# Py2
+RUN /bin/bash -c "source activate python2 && \
+    pip install bokeh"
 
 # Always end on switch to notebook user
 USER jupyter
