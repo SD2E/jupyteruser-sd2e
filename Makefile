@@ -21,7 +21,7 @@ help:
 	echo "You can make: develop, tests, staging, release, clean, distclean"
 
 .SILENT: develop
-develop: .built
+develop: 
 	build/images.sh "$(TENANT_DOCKER_ORG)" build $(LOCAL_TAG) ; \
 	touch .built ; \
 	echo "Built. Now run 'make tests'."
