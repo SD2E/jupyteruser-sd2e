@@ -4,20 +4,23 @@
 /home/jupyter
 ├── cli - TACC cloud CLI
 ├── examples - Exemplar Jupyter notebooks
-├── sd2e-community - SD2 primary project data (agave://data-sd2e-community/)
+├── sd2e-community - SD2 primary project data
 |____reference
 | |____examples
 | | |____jupyter - Additional data sets and exemplar notebooks
-└── tacc-work - Your TACC work filesystem (agave://data-tacc-work-<username>/)
+└── tacc-work - Your TACC work directory
 ```
 
 * Store persistent data, such as notebooks or data sets in tacc-work.
+    * 1+ TB storage quota
+    * High performance accessible across all TACC systems
+    * Formerly _mydata_
+    * Available via Agave API as data-tacc-work-<username>
 * Access (read-only) primary project data in sd2e-community
-    * Additional jupyter example notebooks and data sets available at sd2e-community/
-* Collaborate using the data-sd2e-projects-users Agave storage system
+    * Available via Agave API as data-sd2e-community
+* Collaborate using the data-sd2e-projects-users Agave data resource
 
-
-Learn more about collaborating using TACC Cloud APIs
+Learn more about collaborating using Agave Cloud APIs
 - http://sd2e.org/api-user-guide/
 
 Latest notebook documentation and issue log
