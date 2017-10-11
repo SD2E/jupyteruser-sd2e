@@ -7,8 +7,10 @@ ENV DATA /home/jupyter/sd2e-community
 
 # Force ownership and permissions on /home/jupyter
 USER root
-RUN chmod -R a+rw /home
-RUN chown -R jupyter:G-818301 /home/jupyter/examples
 RUN echo 'PS1="$JPY_USER@\h:\w\$ "' >> /home/jupyter/.bashrc
 ADD ./dotjupyter/custom.css /home/jupyter/.jupyter/custom/custom.css
+ADD docs/SD2E_README.md /home/jupyter/SD2E_README.md
+RUN chmod -R a+rw /home
+RUN chown -R jupyter:G-818301 /home/jupyter/examples
+
 USER jupyter

@@ -80,7 +80,7 @@ clean-files:
 .SILENT: clean-images
 clean-images:
 	docker rmi -f "$(TENANT_DOCKER_ORG)/$(TACC_DOCKER_REPO)$(LOCAL_TAG)" ; \
-	docker rmi -f "$(TENANT_DOCKER_ORG)/$(TACC_DOCKER_REPO)$(STAGING_TAG)" ; \
+	docker rmi -f "$(TACC_DOCKER_ORG)/$(TACC_DOCKER_REPO)$(STAGING_TAG)" ; \
 	docker rmi -f "$(TACC_DOCKER_ORG)/$(TACC_DOCKER_REPO)$(RELEASE_TAG)" ; \
 
 .PHONY: clean
