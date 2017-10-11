@@ -5,3 +5,4 @@
 .released
 *.pyc
 .DS_Store
+test/work/*
