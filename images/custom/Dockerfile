@@ -29,13 +29,8 @@ ADD ./examples/probcomp /home/jupyter/examples/probcomp
 RUN chown -R jupyter:G-818301 /home/jupyter/examples/probcomp
 RUN chmod -R a+rwX /home/jupyter/examples/probcomp
 
-#USER root
-#LABEL "comment"="Enable Bokeh"
-# Py3
-#RUN pip install bokeh 
-# Py2
-#RUN /bin/bash -c "source activate python2 && \
-#    pip install bokeh"
+
+
 
 # Always end on switch to notebook user
 USER jupyter
