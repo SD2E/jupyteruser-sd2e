@@ -6,12 +6,20 @@ LABEL origin="https://bitbucket.org/tacc-cic/jupyter/notebooks/tenants/sd2e/Dock
 USER root
 # Support jupyterthemes and other over-rides
 RUN mkdir -p /home/jupyter/.jupyter/custom/fonts
+RUN pip install jupyterthemes
 RUN chmod -R a+rw /home
+
+# R kernel
+
+RUN apt-get update -y && \
+    apt-get install -y r-base r-recommended && \
+    apt-get clean
+
+RUN conda install -c r r-essentials
+#RUN conda install --quiet -c r "r-base=3.3.1 1"
 
 # allow users to add kernels
 RUN chmod 777 /opt/conda/share/jupyter/kernels
-
-RUN pip install jupyterthemes
 
 USER jupyter
 

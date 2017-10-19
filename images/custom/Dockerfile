@@ -29,8 +29,5 @@ ADD ./examples/probcomp /home/jupyter/examples/probcomp
 RUN chown -R jupyter:G-818301 /home/jupyter/examples/probcomp
 RUN chmod -R a+rwX /home/jupyter/examples/probcomp
 
-
-
-
 # Always end on switch to notebook user
 USER jupyter
