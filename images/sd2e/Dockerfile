@@ -21,6 +21,7 @@ RUN conda install -c anaconda biopython
 # Install latest AgavePy
 WORKDIR /home/jupyter/
 RUN /opt/conda/envs/python2/bin/pip install -e git+https://github.com/TACC/agavepy.git#egg=agavepy
+RUN pip install -e git+https://github.com/TACC/agavepy.git#egg=agavepy
 
 # Enable sd2nb sharing service
 RUN cd /root && \ 
@@ -39,9 +40,11 @@ RUN apt-get update && \
     apt-get install -y tree && \
     apt-get clean
 
-# Make sure Jupyter group == SD2E-Community == G-819382
+# Make sure Jupyter group == SD2E-Community == 819382
 RUN groupadd --gid 819382 G-819382
 RUN usermod -g G-819382 jupyter -a -G G-818301
-RUN find /home/jupyter -gid 819382 -exec chown jupyter:G-819382 {} \;
+RUN find /home/jupyter -gid G-819382 -exec chown jupyter:G-819382 {} \;
+
+ADD jupyteruser-sd2e_release /etc/jupyteruser-sd2e_release
 
 USER jupyter

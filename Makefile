@@ -24,6 +24,7 @@ help:
 
 .SILENT: develop
 develop: 
+	build/find-get-stats.sh > images/sd2e/jupyteruser-sd2e_release
 	build/images.sh "$(TENANT_DOCKER_ORG)" build $(LOCAL_TAG) ; \
 	touch .built ; \
 	echo "Built. Now run 'make tests'."
