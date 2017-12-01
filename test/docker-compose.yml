@@ -15,7 +15,7 @@ services:
       - ./work:/home/jupyter/mydata:rw
       - ./dotjupyter:/home/jupyter/.jupyter:rw
       - ./dotjupyter/jupyter-local-conf.py:/home/jupyter/.jupyter/jupyter_notebook_config.py:rw
-      - ~/.agave/current:/home/jupyter/.agave/current:rw
+      - ~/.agave:/home/jupyter/.agave/:rw
     ports:
       - "8888:8888"
     container_name: jupyter
