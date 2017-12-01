@@ -43,7 +43,7 @@ RUN apt-get update && \
 # Make sure Jupyter group == SD2E-Community == 819382
 RUN groupadd --gid 819382 G-819382
 RUN usermod -g G-819382 jupyter -a -G G-818301
-RUN find /home/jupyter -gid G-819382 -exec chown jupyter:G-819382 {} \;
+RUN find /home/jupyter -group G-819382 -exec chown jupyter:G-819382 {} \;
 
 ADD jupyteruser-sd2e_release /etc/jupyteruser-sd2e_release
 

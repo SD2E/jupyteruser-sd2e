@@ -25,15 +25,15 @@ help:
 .SILENT: develop
 develop: 
 	build/find-get-stats.sh > images/sd2e/jupyteruser-sd2e_release
-	build/images.sh "$(TENANT_DOCKER_ORG)" build $(LOCAL_TAG) ; \
-	touch .built ; \
+	build/images.sh "$(TENANT_DOCKER_ORG)" build $(LOCAL_TAG) && \
+	touch .built && \
 	echo "Built. Now run 'make tests'."
 
 .SILENT: tests
 tests: .built
 	cd test ; \
-	docker-compose up -d ; \
-	echo "Go to http://localhost:8888/ to test" ; \
+	docker-compose up -d && \
+	echo "Go to http://localhost:8888/ to test" && \
 	touch ../.tested
 
 .PHONY: staging

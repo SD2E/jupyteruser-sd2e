@@ -23,7 +23,7 @@ do
         cd "$DIR/../images/${_BASE}"
         if [ -f "Dockerfile" ];
         then
-            $DIR/docker.sh "${_ORG}/${ACTUAL_BASE}" "Dockerfile" "${_COMMAND}" "${_TAG}"
+            $DIR/docker.sh "${_ORG}/${ACTUAL_BASE}" "Dockerfile" "${_COMMAND}" "${_TAG}" || { echo "Error building ${_ORG}/${ACTUAL_BASE}:${_TAG}" >&2 ; exit 1; }
         else
             echo "No Dockerfile. Skipping ${ACTUAL_BASE}"
         fi
