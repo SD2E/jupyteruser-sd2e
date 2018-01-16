@@ -1,31 +1,69 @@
-# Image: taccsciapps/jupyteruser-base
+#Image: sd2e/jupyteruser-base
+#Version: 0.3.0
 
-FROM taccsciapps/jupyteruser-pub
-LABEL origin="https://bitbucket.org/tacc-cic/jupyter/notebooks/tenants/sd2e/Dockerfile"
+FROM taccsciapps/jupyteruser-base
+LABEL origin="https://bitbucket.org/gzynda/jupyter/src/40adbad7b10b34de715d5a86aec3fcf65e724b70/notebooks/base/jupyter-notebook/Dockerfile?at=CIC-425-image-redesign&fileviewer=file-view-default"
 
+###############################################
+# Environment
+###############################################
 USER root
-# Support jupyterthemes and other over-rides
-RUN mkdir -p /home/jupyter/.jupyter/custom/fonts
-RUN pip install jupyterthemes
-RUN chmod -R a+rw /home
 
-# R kernel
+# Image release
+ARG image_version=test
+RUN echo "${image_version}" > /etc/sd2e_jupyteruser-base-release && \
+	chmod a+r /etc/sd2e_jupyteruser-base-release
 
-RUN apt-get update -y && \
-    apt-get install -y r-base r-recommended && \
-    apt-get clean
+# Environment variables
+ENV WORK /home/jupyter/tacc-work
+ENV SD2_DATA /home/jupyter/sd2e-community
 
-RUN conda install -c r r-essentials
-#RUN conda install --quiet -c r "r-base=3.3.1 1"
+# Prompt
+RUN echo 'PS1="$JPY_USER@\h:\w\$ "' >> /home/jupyter/.bashrc
 
 # allow users to add kernels
 RUN chmod 777 /opt/conda/share/jupyter/kernels
 
-USER jupyter
+# Add readme
+ADD docs/SD2E_README.md /home/jupyter/SD2E_README.md
+
+###############################################
+# Packages
+###############################################
+
+# Bioconductor and BioPython
+RUN conda install --yes --quiet -c bioconda bioconductor-biocinstaller && \
+	conda install --yes --quiet biopython && \
+	conda install --yes --quiet -n python2 biopython && \
+	conda clean -tipsy
+
+# Enable sd2nb sharing service
+RUN cd /root && \ 
+	git clone https://github.com/SD2E/sd2nb-app.git && \
+	( cd sd2nb-app && make && make install ) && \
+	rm -rf sd2nb-app
+
+# Enable sd2e-jupyter 
+RUN cd /root && \ 
+	git clone https://github.com/SD2E/sd2e-jupyter-ascending.git && \
+	( cd sd2e-jupyter-ascending && make && make install ) && \
+	rm -rf sd2e-jupyter-ascending
+
+# Ubuntu Packages
+RUN apt-get update && \
+    apt-get install -y tree less && \
+    apt-get clean
 
 # Replace stock Agave CLI with SD2E-customized tooling
-# Don't do this until CLI base is updated with Python 3.x support
-#RUN curl -L https://raw.githubusercontent.com/sd2e/sd2e-cli/master/install/install.sh | sh
-#RUN rm -rf /home/jupyter/cli && \
-#    mv /home/jupyter/sd2e-cloud-cli /home/jupyter/cli
+RUN curl -L https://raw.githubusercontent.com/sd2e/sd2e-cli/master/install/install.sh | sh && \
+	rm -rf /opt/cli && \
+	mv /home/jupyter/sd2e-cloud-cli /opt/cli
 
+###############################################
+# Permissions
+###############################################
+chown -R jupyter /home/jupyter
+find /home/jupyter -type f -exec chmod 660 {} \;
+find /home/jupyter -type d -exec chmod 770 {} \;
+
+USER jupyter
