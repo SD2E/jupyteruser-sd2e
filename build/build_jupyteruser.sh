@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+SDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/../"
 
 function getTags {
 	# Returns the list of tags associated with a dockerhub image
@@ -60,8 +60,8 @@ function buildImage {
 	# Builds an image
 	cd ${SDIR}/$1
 	fileExists Dockerfile
-	IMG=$(getVal Image)
-	VERSION=$(getVal Version)
+	IMG=$(getVal Image:)
+	VERSION=$(getVal Version:)
 	echo "Starting ${IMG}:${VERSION}"
 	if containsTag $IMG $VERSION; then
 		# already exists
@@ -86,15 +86,17 @@ function testImage {
 	# Builds an image
 	cd ${SDIR}/$1
 	fileExists Dockerfile
-	IMG=$(getVal Image)
-	VERSION=$(getVal Version)
+	IMG=$(getVal Image:)
+	VERSION=$(getVal Version:)
 	echo ""
 	if ! askFalse "Do you want to test ${IMG}:${VERSION}?"; then
 		EIP=$(dig +short myip.opendns.com @resolver1.opendns.com)
 		ed "Local Address: http://localhost:8888"
 		ed "External Address: http://${EIP}:8888"
-		ed "docker run --rm -p 8888:8888 -v ${SDIR}/base/jupyter-notebook/jupyter-notebook-localconf.py:/home/jupyter/.jupyter/jupyter_notebook_config.py ${IMG}:${VERSION} start-notebook.sh"
-		docker run --rm -p 8888:8888 -v ${SDIR}/base/jupyter-notebook/jupyter-notebook-localconf.py:/home/jupyter/.jupyter/jupyter_notebook_config.py ${IMG}:${VERSION} start-notebook.sh
+		#ed "docker run --rm -p 8888:8888 -v ${SDIR}/images/base/jupyter-notebook-localconf.py:/home/jupyter/.jupyter/jupyter_notebook_config.py ${IMG}:${VERSION} start-notebook.sh"
+		#docker run --rm -p 8888:8888 -v ${SDIR}/images/base/jupyter-notebook-localconf.py:/home/jupyter/.jupyter/jupyter_notebook_config.py ${IMG}:${VERSION} start-notebook.sh
+		ed "docker run --rm -p 8888:8888 ${IMG}:${VERSION} start-notebook.sh"
+		docker run --rm -p 8888:8888 ${IMG}:${VERSION} start-notebook.sh
 		if [ ! $? -eq 0 ]; then
 			ee "Notebook could not launch"
 		fi
@@ -106,8 +108,8 @@ function pushImage {
 	# Builds an image
 	cd ${SDIR}/$1
 	fileExists Dockerfile
-	IMG=$(getVal Image)
-	VERSION=$(getVal Version)
+	IMG=$(getVal Image:)
+	VERSION=$(getVal Version:)
 	echo ""
 	if askTrue "Do you want to push ${IMG}:${VERSION} to dockerhub?"; then
 		# Check if version already exists on dockerhub
@@ -148,25 +150,25 @@ function pushImage {
 function depFunc {
 	# build target
 	case $2 in
-	base/jupyter-notebook)
-		eval $1 base/jupyter-notebook
+	images/base)
+		eval $1 images/base
 		;;
-	tenants/designsafe)
+	images/custom)
 		echo -e "\n==================================="
 		echo "Checking dependencies"
 		echo "==================================="
-		eval $1 base/jupyter-notebook
+		eval $1 images/base
 		echo -e "\n==================================="
 		echo "Building Target"
 		echo "==================================="
-		eval $1 tenants/designsafe
+		eval $1 images/custom
 		;;
 	*)
-		ee "Please specify either\n\n - base/jupyter-notebook\n - tenants/designsafe"
+		ee "Please specify either\n\n - images/base\n - images/custom"
 		;;
 	esac
 }
-helpStr="Usage: $0 option target\n\nAutomating the build and deploy process for taccsciapps images\n\nPlease specify an option and target\n\nOptions:\n - build\n - test\n - push\n - all\n\nTargets:\n - base/jupyter-notebook\n - tenants/designsafe"
+helpStr="Usage: $0 option target\n\nAutomating the build and deploy process for taccsciapps images\n\nPlease specify an option and target\n\nOptions:\n - build\n - test\n - push\n - all\n\nTargets:\n - images/base\n - images/custom"
 
 # Check to see if docker commands work.
 if ! docker info &> /dev/null; then
@@ -190,9 +192,9 @@ push)
 	depFunc pushImage $2
 	;;
 all)
-	depFunc buildImage tenants/designsafe
-	depFunc testImage tenants/designsafe
-	depFunc pushImage tenants/designsafe
+	depFunc buildImage images/custom
+	depFunc testImage images/custom
+	depFunc pushImage images/custom
 	;;
 *)
 	ee $helpStr

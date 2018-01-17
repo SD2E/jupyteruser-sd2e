@@ -1,34 +1,52 @@
-FROM sd2e/jupyteruser-base:devel
+#Image: sd2e/jupyteruser-sd2e
+#Version: 0.3.0
 
+FROM sd2e/jupyteruser-base:0.3.0
+
+# Image release
+USER root
+ARG image_version=test
+RUN echo "${image_version}" > /etc/sd2e_jupyteruser-sd2e-release && \
+	chmod a+r /etc/sd2e_jupyteruser-sd2e-release
+
+##########################################
+# igraph and networkx
+##########################################
 USER root
 LABEL "comment"="Support for plotly igraph and networkx" "issue"="SD2E/jupyteruser-sd2e/issues/3"
-# Py3
-RUN pip install python-igraph plotly networkx
-# Py2
-RUN /bin/bash -c "source activate python2 && \
-    pip install python-igraph plotly networkx"
+RUN conda install --quiet --yes python-igraph plotly networkx && \
+	conda install --quiet --yes -n python2 python-igraph plotly networkx && \
+	conda clean -tipsy
 
+##########################################
+# Probcomp stack
+##########################################
 USER root
+
 LABEL "comment"="Support for Open Probabilistic Programming Stack" "issue"="SD2E/jupyteruser-sd2e/issues/2"
-# Py2
+# Libraries
 RUN apt-get update && \
     apt-get install -y libboost-all-dev libgsl0-dev ccache && \
     apt-get clean
-RUN /bin/bash -c "source activate python2 && \
-    pip install https://github.com/probcomp/Venturecxx/archive/v0.5.1a20170816.tar.gz"
-RUN /bin/bash -c "source activate python2 && \
-    pip install git+https://github.com/probcomp/cgpm.git@v0.1"
-RUN /bin/bash -c "source activate python2 && \
-    pip install git+https://github.com/probcomp/crosscat.git@v0.1.56"
-RUN /bin/bash -c "source activate python2 && \
-    pip install git+https://github.com/probcomp/bayeslite.git@v0.3.1"
-RUN /bin/bash -c "source activate python2 && \
-    pip install git+https://github.com/probcomp/iventure.git@v0.2"
+# Packages
+RUN conda install -n python2 --quiet --yes flask jsonschema patsy requests six && \
+	conda install -n python2 -c conda-forge apsw && \
+	conda uninstall -n python2 --yes \
+		binutils_impl_linux-64 binutils_linux-64 \
+		gcc_impl_linux-64 gcc_linux-64 \
+		gxx_impl_linux-64 gxx_linux-64
 
-ADD ./examples/probcomp /home/jupyter/examples/probcomp
-RUN chown -R jupyter:G-818301 /home/jupyter/examples/probcomp
-RUN chmod -R a+rwX /home/jupyter/examples/probcomp
+ENV MPLBACKEND=Agg
+RUN bash -c "source activate python2 && pip2 install git+https://github.com/probcomp/Venturecxx@v0.5.1.1 && \   
+        pip2 install git+https://github.com/probcomp/cgpm.git@v0.1.2 && \       
+        pip2 install git+https://github.com/probcomp/crosscat.git@v0.1.56.1 && \
+        pip2 install git+https://github.com/probcomp/bayeslite.git@v0.3.2 && \  
+        pip2 install git+https://github.com/probcomp/iventure.git@v0.2.2"
+RUN rm -rf /home/jupyter/.cache/pip && conda clean -tipsy
 
+RUN mkdir -p /home/jupyter/examples/probcomp && \
+	cd /home/jupyter/examples/probcomp && \
+	curl http://probcomp-workshop-materials.s3.amazonaws.com/latest.tgz | tar -xzf -
 
 ##########################################
 ####  Common Lisp Kernel Setup Begin  ####
@@ -72,10 +90,11 @@ RUN mkdir /opt/conda/share/jupyter/kernels/lisp && \
 
 COPY examples/common-lisp /home/jupyter/examples/common-lisp
 
-########################################
-####  Common Lisp Kernel Setup End  ####
-########################################
+###############################################
+# Permissions
+###############################################
+RUN chown -R jupyter /home/jupyter && \
+	find /home/jupyter -type f -exec chmod 660 {} \; && \
+	find /home/jupyter -type d -exec chmod 770 {} \;
 
-
-# Always end on switch to notebook user
 USER jupyter

@@ -26,6 +26,7 @@ RUN chmod 777 /opt/conda/share/jupyter/kernels
 
 # Add readme
 ADD docs/SD2E_README.md /home/jupyter/SD2E_README.md
+COPY examples/agavepy_example.ipynb /home/jupyter/examples/agavepy_example.ipynb
 
 ###############################################
 # Packages
@@ -36,6 +37,17 @@ RUN conda install --yes --quiet -c bioconda bioconductor-biocinstaller && \
 	conda install --yes --quiet biopython && \
 	conda install --yes --quiet -n python2 biopython && \
 	conda clean -tipsy
+RUN conda uninstall --yes \
+#	libgcc-ng libgfortran-ng libstdcxx-ng \
+	binutils_impl_linux-64 binutils_linux-64 \
+	gcc_impl_linux-64 gcc_linux-64 \
+	gxx_impl_linux-64 gxx_linux-64 && \
+conda uninstall -n python2 --yes \
+#	libgcc-ng libgfortran-ng libstdcxx-ng \
+	binutils_impl_linux-64 binutils_linux-64 \
+	gcc_impl_linux-64 gcc_linux-64 \
+	gxx_impl_linux-64 gxx_linux-64 && \
+conda clean -tipsy
 
 # Enable sd2nb sharing service
 RUN cd /root && \ 
@@ -62,8 +74,8 @@ RUN curl -L https://raw.githubusercontent.com/sd2e/sd2e-cli/master/install/insta
 ###############################################
 # Permissions
 ###############################################
-chown -R jupyter /home/jupyter
-find /home/jupyter -type f -exec chmod 660 {} \;
-find /home/jupyter -type d -exec chmod 770 {} \;
+RUN chown -R jupyter /home/jupyter && \
+	find /home/jupyter -type f -exec chmod 660 {} \; && \
+	find /home/jupyter -type d -exec chmod 770 {} \;
 
 USER jupyter
