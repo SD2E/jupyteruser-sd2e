@@ -57,11 +57,11 @@ RUN mkdir -p /home/jupyter/examples/probcomp && \
 # manager is not the current version.
 RUN mkdir /opt/common-lisp && \
     apt-get update && \
-    apt-get install -y sbcl libzmq3-dev && \
-    cd /opt/common-lisp && \
+    apt-get install -y sbcl libzmq3-dev
+RUN cd /opt/common-lisp && \
     git clone git://git.code.sf.net/p/sbcl/sbcl && \
     cd sbcl && \
-    git checkout tags/sbcl-1.4.0 && \
+    git checkout tags/sbcl-1.4.3 && \
     sh make.sh && \
     cd /opt/common-lisp/sbcl && \
     sh install.sh && \

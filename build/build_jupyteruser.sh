@@ -138,6 +138,12 @@ function pushImage {
 			fi
 		fi
 	fi
+	if ! askFalse "Do you want to tag ${IMG}:${VERSION} as staging?"; then
+		ed "docker tag ${IMG}:${VERSION} ${IMG}:staging"
+		docker tag ${IMG}:${VERSION} ${IMG}:staging
+		ed "docker push ${IMG}:staging"
+		docker push ${IMG}:staging
+	fi
 	if ! askFalse "Do you want to tag ${IMG}:${VERSION} as latest?"; then
 		ed "docker tag ${IMG}:${VERSION} ${IMG}:latest"
 		docker tag ${IMG}:${VERSION} ${IMG}:latest

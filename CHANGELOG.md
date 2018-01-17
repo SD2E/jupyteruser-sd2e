@@ -2,6 +2,12 @@
 
 All notable changes to this project are to be documented in this file.
 
+## Version 0.3.0
+
+ - Refactored images to start from taccsciapps/jupyteruser-base
+ - Updated probcomp stack
+ - Updated sbcl to 1.4.3
+
 ## Version 0.2.0
 
 Summary: Add R, base R and Py packages, useful bits
