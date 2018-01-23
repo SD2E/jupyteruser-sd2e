@@ -5,8 +5,14 @@ All notable changes to this project are to be documented in this file.
 ## Version 0.3.0
 
  - Refactored images to start from taccsciapps/jupyteruser-base
- - Updated probcomp stack
+ - Removed jovyan user and environment
+ - Optimized docker files for size (now smaller)
+ - Updated python stack
+ - Numpy now uses Intel MKL
+ - pip2 now works
+ - Updated probcomp stack and examples
  - Updated sbcl to 1.4.3
+ - Removed Spark, pyspark, and example
 
 ## Version 0.2.0
 

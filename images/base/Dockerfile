@@ -51,18 +51,19 @@ cd /root && \
 	rm -rf sd2e-jupyter-ascending && \
 # Ubuntu Packages
 apt-get update && \
-    apt-get install -y tree less openjdk-8-jre && \
+    apt-get install -y tree less && \
+    #apt-get install -y tree less openjdk-8-jre ca-certificates-java && \
     apt-get clean && \
 # Replace stock Agave CLI with SD2E-customized tooling
 curl -L https://raw.githubusercontent.com/sd2e/sd2e-cli/master/install/install.sh | sh && \
 	rm -rf /opt/cli && \
 	mv /home/jupyter/sd2e-cloud-cli /opt/cli && \
 # Spark 2.2.1 and pyspark
-cd /usr/local && \
-        curl http://apache.claz.org/spark/spark-2.2.1/spark-2.2.1-bin-hadoop2.7.tgz | tar -xzf - && \
-        mv spark-2.2.1-bin-hadoop2.7 spark && \
-        conda install --yes biopython pyspark && \
-        conda install -n python2 --yes biopython pyspark && \
+#cd /usr/local && \
+#        curl http://apache.claz.org/spark/spark-2.2.1/spark-2.2.1-bin-hadoop2.7.tgz | tar -xzf - && \
+#        mv spark-2.2.1-bin-hadoop2.7 spark && \
+#        conda install --yes pyspark && \
+#        conda install -n python2 --yes pyspark && \
 # Clean conda cache
 conda clean -tipsy && \
 # Clean temporary files
