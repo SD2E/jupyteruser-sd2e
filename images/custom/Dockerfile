@@ -1,8 +1,7 @@
 #Image: sd2e/jupyteruser-sd2e
 #Version: 0.3.0
 
-ARG base_version=latest
-FROM sd2e/jupyteruser-base:${base_version}
+FROM sd2e/jupyteruser-base:0.1.0
 
 # Image release
 USER root

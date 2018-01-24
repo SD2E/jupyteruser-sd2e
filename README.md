@@ -4,14 +4,13 @@
 
 * Jupyter Notebook server (v4.0.x or v3.2.x, see tag)
 * Conda Python 3.4.x and Python 2.7.x environments
-* Pyspark, pandas, matplotlib, scipy, seaborn, scikit-learn pre-installed
+* pandas, matplotlib, scipy, seaborn, scikit-learn, numba pre-installed
 * R-essentials (including an R kernel)
 * Plotly, igraph, and networkx for graphs and plots
-* MIT's Open Probabilistic Programming Stack
+* MIT's [Open Probabilistic Programming Stack](http://probcomp.org/)
+* [Common Lisp kernel and stack](http://www.sbcl.org/)
 * Bioconda and Bioconductor
 * BioPython
-* Spark 1.4.1
-* 
 
 ### SD2E Specific Features
 

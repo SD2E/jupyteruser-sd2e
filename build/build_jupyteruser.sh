@@ -1,7 +1,5 @@
 #!/bin/bash
 
-SDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/../"
-
 function getTags {
 	# Returns the list of tags associated with a dockerhub image
 	image=$1
@@ -30,10 +28,14 @@ function ed {
 	# Echos to STDERR
 	echo -e "[DEBUG] $@" 1>&2;
 }
+function ew {
+	# Echos to STDERR
+	echo -e "[WARNING] $@" 1>&2;
+}
 function fileExists {
 	# Checks to see if a file exists relaive to pwd
 	if [ ! -e $1 ]; then
-		ee "$1 not found in $dir"
+		ee "$1 not found"
 	fi
 }
 function askTrue {
@@ -58,34 +60,33 @@ function prevInfo {
 
 function buildImage {
 	# Builds an image
-	cd ${SDIR}/$1
-	fileExists Dockerfile
+	fileExists $1/Dockerfile
+	cd $1
 	IMG=$(getVal Image:)
 	VERSION=$(getVal Version:)
+	DEP=$(getVal FROM)
+	if [ -z "$(docker images -q $DEP)" ] && ! containsTag ${DEP%%:*} ${DEP##*:}; then
+		ee "Could not find $DEP locally or on dockerhub. Please build it to build ${1}"
+	fi
 	echo "Starting ${IMG}:${VERSION}"
 	if containsTag $IMG $VERSION; then
 		# already exists
-		if ! askTrue "${VERSION} already exists for ${IMG} on dockerhub. Do you want to use that public image instead of rebuilding?"; then
-			# rebuild
-			echo "Building ${IMG}:${VERSION}"
-			ed "docker build --build-arg image_version=${VERSION} -t $IMG:${VERSION} ."
-			! docker build --build-arg image_version=${VERSION} -t $IMG:${VERSION} . && ee "Failed to build $IMG:$VERSION"
+		if ! askFalse "${VERSION} already exists for ${IMG} on dockerhub. Did you want to increment the version?"; then
+			echo -e "\nPlease increment \"Version:\" in $1/Dockerfile\n"
+			exit 0
 		fi
-	else
-		# create version for first time
-		echo "Building ${IMG}:${VERSION}"
-		prevInfo $IMG
-		ed "docker build --build-arg image_version=${VERSION} -t $IMG:${VERSION} ."
-		! docker build --build-arg image_version=${VERSION} -t $IMG:${VERSION} . && ee "Failed to build $IMG:$VERSION"
 	fi
-	echo "Finished ${IMG}:${VERSION}"
-	# Go back to original directory
-	cd $OLDPWD
+	ed "Building ${IMG}:${VERSION}"
+	prevInfo $IMG
+	ed "docker build --build-arg image_version=${VERSION} -t $IMG:${VERSION} ."
+	! docker build --build-arg image_version=${VERSION} -t $IMG:${VERSION} . && ee "Failed to build $IMG:$VERSION"
+	ed "Finished ${IMG}:${VERSION}"
 }
+
 function testImage {
 	# Builds an image
-	cd ${SDIR}/$1
-	fileExists Dockerfile
+	fileExists $1/Dockerfile
+	cd $1
 	IMG=$(getVal Image:)
 	VERSION=$(getVal Version:)
 	echo ""
@@ -93,21 +94,27 @@ function testImage {
 		EIP=$(dig +short myip.opendns.com @resolver1.opendns.com)
 		ed "Local Address: http://localhost:8888"
 		ed "External Address: http://${EIP}:8888"
-		#ed "docker run --rm -p 8888:8888 -v ${SDIR}/images/base/jupyter-notebook-localconf.py:/home/jupyter/.jupyter/jupyter_notebook_config.py ${IMG}:${VERSION} start-notebook.sh"
-		#docker run --rm -p 8888:8888 -v ${SDIR}/images/base/jupyter-notebook-localconf.py:/home/jupyter/.jupyter/jupyter_notebook_config.py ${IMG}:${VERSION} start-notebook.sh
 		ed "docker run --rm -p 8888:8888 ${IMG}:${VERSION} start-notebook.sh"
 		docker run --rm -p 8888:8888 ${IMG}:${VERSION} start-notebook.sh
 		if [ ! $? -eq 0 ]; then
 			ee "Notebook could not launch"
 		fi
 	fi
-	# Go back to original directory
-	cd $OLDPWD
 }
+
+function cleanImage {
+	# Builds an image
+	fileExists $1/Dockerfile
+	cd $1
+	IMG=$(getVal Image:)
+	docker images -a | grep ${IMG} | awk '{print $3}' | xargs -n 1 docker rmi -f
+	docker images -q --filter dangling=true | xargs -n 1 docker rmi -f
+}
+
 function pushImage {
 	# Builds an image
-	cd ${SDIR}/$1
-	fileExists Dockerfile
+	fileExists $1/Dockerfile
+	cd $1
 	IMG=$(getVal Image:)
 	VERSION=$(getVal Version:)
 	echo ""
@@ -115,7 +122,7 @@ function pushImage {
 		# Check if version already exists on dockerhub
 		if containsTag $IMG $VERSION; then
 			# If it does, should it be overwritten?
-			echo -e "[WARNING] the tag '${VERSION}' already exists for ${IMG} on dockerhub."
+			ew "the tag '${VERSION}' already exists for ${IMG} on dockerhub."
 			if ! askFalse "Do you want to overwrite it?"; then
 				ed "Overwriting dockerhub://${IMG}:${VERSION} with local version"
 				# Print info about previous tag
@@ -126,7 +133,7 @@ function pushImage {
 					ee "Could not push notebook to dockerhub"
 				fi
 			else
-				echo "Please increment the 'Version' in ${SDIR}/${1}/Dockerfile and re-build"
+				echo "Please increment the 'Version:' in ${1}/Dockerfile and re-build"
 				exit 0
 			fi
 		else
@@ -138,48 +145,15 @@ function pushImage {
 			fi
 		fi
 	fi
-	if ! askFalse "Do you want to tag ${IMG}:${VERSION} as staging?"; then
-		ed "docker tag ${IMG}:${VERSION} ${IMG}:staging"
-		docker tag ${IMG}:${VERSION} ${IMG}:staging
-		ed "docker push ${IMG}:staging"
-		docker push ${IMG}:staging
+	if askTrue "Do you want to tag ${IMG}:${VERSION} as ${3}?"; then
+		ed "docker tag ${IMG}:${VERSION} ${IMG}:${3}"
+		docker tag ${IMG}:${VERSION} ${IMG}:${3}
+		ed "docker push ${IMG}:${3}"
+		docker push ${IMG}:${3}
 	fi
-	if ! askFalse "Do you want to tag ${IMG}:${VERSION} as latest?"; then
-		ed "docker tag ${IMG}:${VERSION} ${IMG}:latest"
-		docker tag ${IMG}:${VERSION} ${IMG}:latest
-		ed "docker push ${IMG}:latest"
-		docker push ${IMG}:latest
-	fi
-	# Go back to original directory
-	cd $OLDPWD
 }
-function depFunc {
-	# build target
-	case $2 in
-	images/base)
-		eval $1 images/base
-		;;
-	images/custom)
-		echo -e "\n==================================="
-		echo "Checking dependencies"
-		echo "==================================="
-		eval $1 images/base
-		echo -e "\n==================================="
-		echo "Building Target"
-		echo "==================================="
-		eval $1 images/custom
-		;;
-	*)
-		ee "Please specify either\n\n - images/base\n - images/custom"
-		;;
-	esac
-}
-helpStr="Usage: $0 option target\n\nAutomating the build and deploy process for taccsciapps images\n\nPlease specify an option and target\n\nOptions:\n - build\n - test\n - push\n - all\n\nTargets:\n - images/base\n - images/custom"
 
-# Check to see if docker commands work.
-if ! docker info &> /dev/null; then
-	ee "Could not communicate with docker daemon. You may need to run with sudo."
-fi
+helpStr="Usage: $0 option target\n\nAutomating the build and deploy process for taccsciapps images\n\nPlease specify an option and target\n\nOptions:\n - build\n - test\n - push\n - all\n\nTargets:\n - images/base\n - images/custom"
 
 # Make sure enough arguments were used
 if [ ! $# -eq 2 ]; then
@@ -189,18 +163,20 @@ fi
 # Perform option on target
 case $1 in
 build)
-	depFunc buildImage $2
+	buildImage $2
 	;;
 test)
-	depFunc testImage $2
+	testImage $2
 	;;
-push)
-	depFunc pushImage $2
+stage)
+	pushImage $2 staging
 	;;
-all)
-	depFunc buildImage images/custom
-	depFunc testImage images/custom
-	depFunc pushImage images/custom
+release)
+	pushImage $2 latest
+	;;
+clean)
+	cleanImage $2 2> /dev/null
+	exit 0
 	;;
 *)
 	ee $helpStr
