@@ -1,100 +1,94 @@
-include build/config.mk
+.ONESHELL:
+.PHONY: build test docker help stage release clean
+ifndef VERBOSE
+.SILENT: build test docker help stage release clean
+endif
 
-PREFIX := $(HOME)
-
-TACC_DOCKER_ORG := $(TACC_DOCKER_ORG)
-TENANT_DOCKER_ORG := $(TENANT_DOCKER_ORG)
-TENANT_DOCKER_REPO := $(TENANT_DOCKER_REPO)
-RELEASE_TAG := $(RELEASE_TAG)
-STAGING_TAG := $(STAGING_TAG)
-LOCAL_TAG := $(LOCAL_TAG)
-
-OBJ := $(MAKE_OBJ)
-SOURCES =
-
-.SILENT: all
-all:
-	echo "Not implemented. Try 'make help' for usage information."
+all: help
+	@:
 
 .PHONY: help
-.SILENT: help
 help:
-	echo "You can make: develop, tests, staging, release, clean, distclean" ; \
-	echo "You can make: server-start, server-restart, server-stop to manage build-local Jupyter"
+	echo "\nUsage: make [action] [target]\n"
+	echo "Actions:"
+	echo " - build   - build docker images locally"
+	echo " - test    - test images locally"
+	echo " - stage   - push images to staging environment"
+	echo " - release - push images to production environment\n"
+	echo "Targets:"
+	echo " - base - Recipe in images/base"
+	echo " - sd2e - Recipe in images/custom which is where all community software should belong"
+	echo " - singularity - Image for running on TACC HPC\n"
 
-.SILENT: develop
-develop: 
-	build/find-get-stats.sh > images/sd2e/jupyteruser-sd2e_release
-	build/images.sh "$(TENANT_DOCKER_ORG)" build $(LOCAL_TAG) ; \
-	touch .built ; \
-	echo "Built. Now run 'make tests'."
+# Make sure image targets are not used as make targets
+%:
+	@:
 
-.SILENT: tests
-tests: .built
-	cd test ; \
-	docker-compose up -d ; \
-	echo "Go to http://localhost:8888/ to test" ; \
-	touch ../.tested
+docker:
+	docker info > /dev/null 2> /dev/null
+	if [ ! $$? -eq 0 ]; then
+		echo "\n[ERROR] Could not communicate with docker daemon. You may need to run with sudo.\n"
+		exit 1
+	fi
 
-.PHONY: staging
-.SILENT: staging
-staging:
-	docker tag $(TENANT_DOCKER_ORG)/$(TACC_DOCKER_REPO)$(LOCAL_TAG) $(TACC_DOCKER_ORG)/$(TACC_DOCKER_REPO)$(STAGING_TAG)
-	docker push $(TACC_DOCKER_ORG)/$(TACC_DOCKER_REPO)$(STAGING_TAG)
-	echo "$(TACC_DOCKER_ORG)/$(TACC_DOCKER_REPO)$(STAGING_TAG) released"
+build: docker
+	TARGET=$(filter-out $@,$(MAKECMDGOALS))
+	case $${TARGET} in
+	base)
+		build/build_jupyteruser.sh build images/base
+		;;
+	sd2e)
+		build/build_jupyteruser.sh build images/custom
+		;;
+	singularity)
+		build/build_jupyteruser.sh build images/singularity
+		;;
+	*)
+		$(MAKE) help
+		;;
+	esac
 
-.PHONY: release
-.SILENT: release
-release:
-	docker tag $(TACC_DOCKER_ORG)/$(TACC_DOCKER_REPO)$(STAGING_TAG) $(TACC_DOCKER_ORG)/$(TACC_DOCKER_REPO)$(RELEASE_TAG)
-	docker push $(TACC_DOCKER_ORG)/$(TACC_DOCKER_REPO)$(RELEASE_TAG)
-	echo "$(TACC_DOCKER_ORG)/$(TACC_DOCKER_REPO)$(RELEASE_TAG) released"
+test: docker
+	TARGET=$(filter-out $@,$(MAKECMDGOALS))
+	case $$TARGET in
+	base)
+		build/build_jupyteruser.sh test images/base
+	sd2e)
+		build/build_jupyteruser.sh test images/custom
+	singularity)
+		build/build_jupyteruser.sh test images/singularity
+	*)
+		$(MAKE) help
+	esac
 
-.PHONY: server-start
-.SILENT: server-start
-server-start:
-	touch .server ; \
-	cd test ; \
-	docker-compose up -d > /dev/null 2>&1 ; \
-	echo "Server online: Go to http://localhost:8888/ to test"
+stage: docker
+	TARGET=$(filter-out $@,$(MAKECMDGOALS))
+	case $$TARGET in
+	base)
+		build/build_jupyteruser.sh stage images/base
+	sd2e)
+		build/build_jupyteruser.sh stage images/custom
+	singularity)
+		build/build_jupyteruser.sh stage images/singularity
+	*)
+		$(MAKE) help
+	esac
 
-.PHONY: server-stop
-.SILENT: server-stop
-server-stop:
-	rm -f .server ; \
-	cd test ; \
-	docker-compose down > /dev/null 2>&1 ; \
-	echo "Server offline"
+release: docker
+	TARGET=$(filter-out $@,$(MAKECMDGOALS))
+	case $$TARGET in
+	base)
+		build/build_jupyteruser.sh release images/base
+	sd2e)
+		build/build_jupyteruser.sh release images/custom
+	singularity)
+		build/build_jupyteruser.sh release images/singularity
+	*)
+		$(MAKE) help
+	esac
 
-.PHONY: server-restart
-.SILENT: server-restart
-server-restart: server-stop server-start
-	echo "Restarted"
-
-.PHONY: clean-files
-.SILENT: clean-files
-clean-files:
-	rm -f .built .tested .staged .released ; \
-	echo "Staging dotfiles deleted"
-
-.PHONY: clean-images
-.SILENT: clean-images
-clean-images:
-	docker rmi -f "$(TENANT_DOCKER_ORG)/$(TACC_DOCKER_REPO)$(LOCAL_TAG)" ; \
-	docker rmi -f "$(TACC_DOCKER_ORG)/$(TACC_DOCKER_REPO)$(STAGING_TAG)" ; \
-	docker rmi -f "$(TACC_DOCKER_ORG)/$(TACC_DOCKER_REPO)$(RELEASE_TAG)" ; \
-
-.PHONY: clean
-.SILENT: clean
-clean: clean-files server-stop
-
-.PHONY: distclean
-.SILENT: distclean
-distclean: clean clean-images
-
-.PHONY: info
-.SILENT: info
-info: 
-	echo "devel/staging: $(TENANT_DOCKER_ORG)/$(TACC_DOCKER_REPO)" ; \
-	echo "production: $(TACC_DOCKER_ORG)/$(TACC_DOCKER_REPO)" ; \
-	echo "tags:\n - local: $(LOCAL_TAG)\n - staging: $(STAGING_TAG)\n - release: $(RELEASE_TAG)"
+clean: docker
+	TARGET=$(filter-out $@,$(MAKECMDGOALS))
+	build/build_jupyteruser.sh clean images/singularity
+	build/build_jupyteruser.sh clean images/custom
+	build/build_jupyteruser.sh clean images/base
