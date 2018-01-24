@@ -32,12 +32,12 @@ sudo make build sd2e
 sudo make test sd2e
 ```
 * Push your branch to your Github fork when you're ready for integration
-* Submit a Pull Request against the SD2E `development` branch
+* Submit a Pull Request against the SD2E `development` branch (template provided once again)
 * Your PR will be reviewed:
   * A Docker image will be built from your code and will be available in about an hour on the test Jupyter server: https://jupyter-staging.sd2e.org/
   * Both the SD2E development team and you must review and validate
     * The updated/new functionality
-    * Completeness and correctness provided documenation
+    * Completeness and correctness of provided documenation
 * The code will be merged into `master` and used to build the production SD2E Jupyter Notebooks image
     * The updated image will be live in around a day on the production cluster
 

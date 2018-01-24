@@ -37,4 +37,4 @@ Push an image that passes tests in staging to production with
 ```
 sudo make release sd2e
 ```
-which tags the image as latest for the production environment to pick up.
+which tags the image as `latest` for the production environment to pick up.
