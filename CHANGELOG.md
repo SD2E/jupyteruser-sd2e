@@ -13,6 +13,12 @@ All notable changes to this project are to be documented in this file.
  - Updated probcomp stack and examples
  - Updated sbcl to 1.4.3
  - Removed Spark, pyspark, and example
+ - Updated instructions for contributing and maintaining software
+ - Updated Makefile to utilize `build/build_jupyteruser.sh` to:
+   - Check for dependencies
+   - Check tags on docker hub
+   - Version each sub-image
+   - Build, test, and deploy without squashing tags
 
 ## Version 0.2.0
 

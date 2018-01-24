@@ -19,6 +19,10 @@ git checkout -b myFeature development
 * In `images/custom`:
   * Edit the `Dockerfile` to add your software
   * Add example files and notebooks
+* Clear local image cache
+```
+sudo make clean
+```
 * Build the new image
 ```
 sudo make build sd2e
