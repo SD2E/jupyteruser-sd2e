@@ -51,7 +51,8 @@ cd /root && \
 	rm -rf sd2e-jupyter-ascending && \
 # Ubuntu Packages
 apt-get update && \
-    apt-get install -y tree less && \
+    # jq is required for abaco CLI
+    apt-get install -y tree less jq && \
     #apt-get install -y tree less openjdk-8-jre ca-certificates-java && \
     apt-get clean && \
 # Replace stock Agave CLI with SD2E-customized tooling
