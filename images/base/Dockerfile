@@ -1,5 +1,5 @@
 #Image: sd2e/jupyteruser-base
-#Version: 0.1.0
+#Version: 0.1.1
 
 FROM taccsciapps/jupyteruser-base:latest
 LABEL origin="https://bitbucket.org/gzynda/jupyter/src/40adbad7b10b34de715d5a86aec3fcf65e724b70/notebooks/base/jupyter-notebook/Dockerfile?at=CIC-425-image-redesign&fileviewer=file-view-default"
@@ -59,6 +59,7 @@ apt-get update && \
 curl -L https://raw.githubusercontent.com/sd2e/sd2e-cli/master/install/install.sh | sh && \
 	rm -rf /opt/cli && \
 	mv /home/jupyter/sd2e-cloud-cli /opt/cli && \
+	chmod -R a+rX /opt/cli && \
 # Spark 2.2.1 and pyspark
 #cd /usr/local && \
 #        curl http://apache.claz.org/spark/spark-2.2.1/spark-2.2.1-bin-hadoop2.7.tgz | tar -xzf - && \

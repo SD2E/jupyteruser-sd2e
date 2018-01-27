@@ -53,12 +53,16 @@ test: docker
 	case $$TARGET in
 	base)
 		build/build_jupyteruser.sh test images/base
+		;;
 	sd2e)
 		build/build_jupyteruser.sh test images/custom
+		;;
 	singularity)
 		build/build_jupyteruser.sh test images/singularity
+		;;
 	*)
 		$(MAKE) help
+		;;
 	esac
 
 stage: docker
@@ -66,12 +70,16 @@ stage: docker
 	case $$TARGET in
 	base)
 		build/build_jupyteruser.sh stage images/base
+		;;
 	sd2e)
 		build/build_jupyteruser.sh stage images/custom
+		;;
 	singularity)
 		build/build_jupyteruser.sh stage images/singularity
+		;;
 	*)
 		$(MAKE) help
+		;;
 	esac
 
 release: docker
@@ -79,12 +87,16 @@ release: docker
 	case $$TARGET in
 	base)
 		build/build_jupyteruser.sh release images/base
+		;;
 	sd2e)
 		build/build_jupyteruser.sh release images/custom
+		;;
 	singularity)
 		build/build_jupyteruser.sh release images/singularity
+		;;
 	*)
 		$(MAKE) help
+		;;
 	esac
 
 clean: docker

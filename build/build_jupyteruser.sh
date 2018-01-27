@@ -145,11 +145,11 @@ function pushImage {
 			fi
 		fi
 	fi
-	if askTrue "Do you want to tag ${IMG}:${VERSION} as ${3}?"; then
-		ed "docker tag ${IMG}:${VERSION} ${IMG}:${3}"
-		docker tag ${IMG}:${VERSION} ${IMG}:${3}
-		ed "docker push ${IMG}:${3}"
-		docker push ${IMG}:${3}
+	if askTrue "Do you want to tag ${IMG}:${VERSION} as ${2}?"; then
+		ed "docker tag ${IMG}:${VERSION} ${IMG}:${2}"
+		docker tag ${IMG}:${VERSION} ${IMG}:${2}
+		ed "docker push ${IMG}:${2}"
+		docker push ${IMG}:${2}
 	fi
 }
 
