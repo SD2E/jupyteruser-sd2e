@@ -6,11 +6,11 @@ FROM sd2e/jupyteruser-sd2e:0.3.1
 # Image release
 USER root
 ARG image_version=development
-RUN echo "${image_version}" > /etc/sd2e_jupyteruser-sd2e-release && \
-	chmod a+r /etc/sd2e_jupyteruser-sd2e-release
+RUN echo "${image_version}" > /etc/sd2e_jupyteruser-singularity-release && \
+	chmod a+r /etc/sd2e_jupyteruser-singularity-release
 
 # Make sd2e dir
-ARG SD2E_DIR=/opt/sd2e
+ENV SD2E_DIR=/opt/sd2e
 ARG SD2E_HOME=/opt/sd2e/jupyter
 RUN [ ! -e $SD2E_DIR ] && mkdir -p $SD2E_HOME && \
 ##########################################
@@ -24,7 +24,7 @@ rm -rf $SD2E_HOME
 ##########################################
 # Modify default config
 ##########################################
-RUN echo -e "\n\n# Set a password if PASSWORD is set\n\
+RUN echo "\n\n# Set a password if PASSWORD is set\n\
 if 'PASSWORD' in os.environ:\n\
 \tfrom IPython.lib import passwd\n\
 \tc.NotebookApp.password = passwd(os.environ['PASSWORD'])\n\
@@ -35,6 +35,17 @@ c.NotebookApp.iopub_data_rate_limit=10000000" >> /etc/jupyter/jupyter_notebook_c
 ##########################################
 COPY enter_singularity.sh /bin/enter_singularity.sh
 RUN chmod 755 /bin/enter_singularity.sh
-CMD ["enter_singularity.sh"]
+#ENTRYPOINT ["/bin/bash"]
+#CMD ["/bin/enter_singularity.sh"]
+##########################################
+# Clean up ENV
+##########################################
+ENV NB_USER=
+ENV NB_UID=
+ENV NB_GID=
+#ENV HOME=
+#ENV USER=
+#ENV XDG_CACHE_HOME=
+#ENV WORK=
 
 USER jupyter

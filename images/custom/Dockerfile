@@ -16,7 +16,7 @@ USER root
 LABEL "comment"="Support for plotly igraph and networkx" "issue"="SD2E/jupyteruser-sd2e/issues/3"
 RUN conda install --quiet --yes python-igraph plotly networkx && \
 	conda install --quiet --yes -n python2 python-igraph plotly networkx && \
-	conda clean -tipsy
+	docker-clean
 
 ##########################################
 # Probcomp stack
@@ -43,8 +43,7 @@ bash -c "source activate python2 && pip2 install git+https://github.com/probcomp
         pip2 install git+https://github.com/probcomp/bayeslite.git@v0.3.2 && \
         pip2 install git+https://github.com/probcomp/iventure.git@v0.2.2" && \
 # Clean cache
-apt-get clean && conda clean -tipsy && \
-bash -c "for dir in /tmp/* /var/tmp/* /home/jupyter/.cache/pip /root/.cache/pip; do [ -e $dir ] && rm -rf $dir; done"
+docker-clean
 
 RUN mkdir -p /home/jupyter/examples/probcomp && \
 	cd /home/jupyter/examples/probcomp && \
@@ -89,11 +88,30 @@ COPY common-lisp/sbclrc /home/jupyter/.sbclrc
 
 # Move the kernel json file to the correct location
 RUN mkdir /opt/conda/share/jupyter/kernels/lisp && \
-    mv /home/jupyter/.ipython/kernels/lisp/kernel.json /opt/conda/share/jupyter/kernels/lisp && \
+    mv $HOME/.ipython/kernels/lisp/kernel.json /opt/conda/share/jupyter/kernels/lisp && \
     chmod -R a+rwX /opt/conda/share/jupyter/kernels/lisp && \
-    rm -rf /home/jupyter/.ipython
+    rm -rf ${HOME}/.ipython && docker-clean
 
 COPY examples/common-lisp /home/jupyter/examples/common-lisp
+
+##########################################
+# pyemd support
+##########################################
+USER root
+LABEL "comment"="support for pyemd" "issue"="SD2E/jupyteruser-sd2e/issues/8"
+RUN conda install --quiet --yes pyemd && \
+	conda install --quiet --yes -n python2 pyemd && \
+	docker-clean
+
+##########################################
+# Support DSGRN code
+##########################################
+USER root
+LABEL "comment"="Support DSGRN code" "issue"="SD2E/jupyteruser-sd2e/issues/9"
+RUN apt-get install -y cmake graphviz && \
+	conda install --quiet --yes python-graphviz && \
+	conda install --quiet --yes -n python2 python-graphviz && \
+	docker-clean
 
 ###############################################
 # Permissions
