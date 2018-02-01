@@ -23,9 +23,10 @@ echo 'PS1="$JUPYTERHUB_USER@\h:\w\$ "' >> /home/jupyter/.bashrc && \
 # allow users to add kernels
 chmod 777 /opt/conda/share/jupyter/kernels && \
 # Environment variables
-echo "WORK=/home/jupyter/tacc-work\n\
-SD2_DATA=/home/jupyter/sd2e-community\n\
-PYTHONUSERBASE=/home/jupyter/tacc-work/jupyter_packages\n" >> /home/jupyter/.bashrc
+echo "export JPY_USER=$JUPYTERHUB_USER\n\
+export WORK=/home/jupyter/tacc-work\n\
+export SD2_DATA=/home/jupyter/sd2e-community\n\
+export PYTHONUSERBASE=/home/jupyter/tacc-work/jupyter_packages\n" >> /home/jupyter/.bashrc
 
 # Add readme
 ADD docs/SD2E_README.md /home/jupyter/SD2E_README.md
@@ -52,8 +53,8 @@ cd /root && \
 	rm -rf sd2e-jupyter-ascending && \
 # Ubuntu Packages
 apt-get update && \
-    # jq is required for abaco CLI
-    apt-get install -y tree less jq rsync column && \
+    # jq and bsdmainutils->column is required for abaco CLI
+    apt-get install -y tree less jq rsync bsdmainutils && \
     #apt-get install -y tree less openjdk-8-jre ca-certificates-java && \
     docker-clean
 # Replace stock Agave CLI with SD2E-customized tooling

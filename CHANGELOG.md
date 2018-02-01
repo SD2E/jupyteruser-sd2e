@@ -2,6 +2,16 @@
 
 All notable changes to this project are to be documented in this file.
 
+## Version 0.3.1
+
+ - Added `PYTHONUSERBASE` variable, which points at `tacc-work/jupyter_packages`, and allows for persistent local pip installs
+ - Added pyemd
+ - Added graphviz, python-graphviz, cmake to support DSGRN
+ - FIXED git funtionality by setting
+   - `GIT_COMMITTER\_NAME=$JUPYTERHUB\_USER`
+   - `GIT_COMMITTER\_EMAIL=${JUPYTERHUB\_USER}@sd2e.org`
+ - REMOVED the hardcoding of `MPLBACKEND` to `Agg`
+
 ## Version 0.3.0
 
  - Refactored images to start from taccsciapps/jupyteruser-base

@@ -25,7 +25,6 @@ USER root
 
 LABEL "comment"="Support for Open Probabilistic Programming Stack" "issue"="SD2E/jupyteruser-sd2e/issues/2"
 # Libraries
-ENV MPLBACKEND=Agg
 RUN apt-get update && \
     apt-get install -y libboost-all-dev libgsl0-dev ccache && \
     apt-get clean && \
@@ -37,7 +36,7 @@ conda install -n python2 --quiet --yes flask jsonschema patsy requests six && \
 		gcc_impl_linux-64 gcc_linux-64 \
 		gxx_impl_linux-64 gxx_linux-64 && \
 # Install probcomp software stack
-bash -c "source activate python2 && pip2 install git+https://github.com/probcomp/Venturecxx@v0.5.1.1 && \   
+bash -c "export MPLBACKEND=Agg && source activate python2 && pip2 install git+https://github.com/probcomp/Venturecxx@v0.5.1.1 && \   
         pip2 install git+https://github.com/probcomp/cgpm.git@v0.1.2 && \
         pip2 install git+https://github.com/probcomp/crosscat.git@v0.1.56.1 && \
         pip2 install git+https://github.com/probcomp/bayeslite.git@v0.3.2 && \
