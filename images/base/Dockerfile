@@ -23,7 +23,7 @@ echo 'PS1="$JUPYTERHUB_USER@\h:\w\$ "' >> /home/jupyter/.bashrc && \
 # allow users to add kernels
 chmod 777 /opt/conda/share/jupyter/kernels && \
 # Environment variables
-echo "export JPY_USER=$JUPYTERHUB_USER\n\
+echo "export JPY_USER=\$JUPYTERHUB_USER\n\
 export WORK=/home/jupyter/tacc-work\n\
 export SD2_DATA=/home/jupyter/sd2e-community\n\
 export PYTHONUSERBASE=/home/jupyter/tacc-work/jupyter_packages\n" >> /home/jupyter/.bashrc
