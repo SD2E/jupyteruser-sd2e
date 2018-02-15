@@ -1,7 +1,7 @@
 #Image: sd2e/jupyteruser-sd2e
-#Version: 0.3.0
+#Version: 0.3.1
 
-FROM sd2e/jupyteruser-base:0.1.0
+FROM sd2e/jupyteruser-base:0.1.1
 
 # Image release
 USER root
@@ -16,7 +16,7 @@ USER root
 LABEL "comment"="Support for plotly igraph and networkx" "issue"="SD2E/jupyteruser-sd2e/issues/3"
 RUN conda install --quiet --yes python-igraph plotly networkx && \
 	conda install --quiet --yes -n python2 python-igraph plotly networkx && \
-	conda clean -tipsy
+	docker-clean
 
 ##########################################
 # Probcomp stack
@@ -25,7 +25,6 @@ USER root
 
 LABEL "comment"="Support for Open Probabilistic Programming Stack" "issue"="SD2E/jupyteruser-sd2e/issues/2"
 # Libraries
-ENV MPLBACKEND=Agg
 RUN apt-get update && \
     apt-get install -y libboost-all-dev libgsl0-dev ccache && \
     apt-get clean && \
@@ -37,14 +36,13 @@ conda install -n python2 --quiet --yes flask jsonschema patsy requests six && \
 		gcc_impl_linux-64 gcc_linux-64 \
 		gxx_impl_linux-64 gxx_linux-64 && \
 # Install probcomp software stack
-bash -c "source activate python2 && pip2 install git+https://github.com/probcomp/Venturecxx@v0.5.1.1 && \   
+bash -c "export MPLBACKEND=Agg && source activate python2 && pip2 install git+https://github.com/probcomp/Venturecxx@v0.5.1.1 && \   
         pip2 install git+https://github.com/probcomp/cgpm.git@v0.1.2 && \
         pip2 install git+https://github.com/probcomp/crosscat.git@v0.1.56.1 && \
         pip2 install git+https://github.com/probcomp/bayeslite.git@v0.3.2 && \
         pip2 install git+https://github.com/probcomp/iventure.git@v0.2.2" && \
 # Clean cache
-apt-get clean && conda clean -tipsy && \
-bash -c "for dir in /tmp/* /var/tmp/* /home/jupyter/.cache/pip /root/.cache/pip; do [ -e $dir ] && rm -rf $dir; done"
+docker-clean
 
 RUN mkdir -p /home/jupyter/examples/probcomp && \
 	cd /home/jupyter/examples/probcomp && \
@@ -89,11 +87,30 @@ COPY common-lisp/sbclrc /home/jupyter/.sbclrc
 
 # Move the kernel json file to the correct location
 RUN mkdir /opt/conda/share/jupyter/kernels/lisp && \
-    mv /home/jupyter/.ipython/kernels/lisp/kernel.json /opt/conda/share/jupyter/kernels/lisp && \
+    mv $HOME/.ipython/kernels/lisp/kernel.json /opt/conda/share/jupyter/kernels/lisp && \
     chmod -R a+rwX /opt/conda/share/jupyter/kernels/lisp && \
-    rm -rf /home/jupyter/.ipython
+    rm -rf ${HOME}/.ipython && docker-clean
 
 COPY examples/common-lisp /home/jupyter/examples/common-lisp
+
+##########################################
+# pyemd support
+##########################################
+USER root
+LABEL "comment"="support for pyemd" "issue"="SD2E/jupyteruser-sd2e/issues/8"
+RUN conda install --quiet --yes pyemd && \
+	conda install --quiet --yes -n python2 pyemd && \
+	docker-clean
+
+##########################################
+# Support DSGRN code
+##########################################
+USER root
+LABEL "comment"="Support DSGRN code" "issue"="SD2E/jupyteruser-sd2e/issues/9"
+RUN apt-get install -y cmake graphviz && \
+	conda install --quiet --yes python-graphviz && \
+	conda install --quiet --yes -n python2 python-graphviz && \
+	docker-clean
 
 ###############################################
 # Permissions
