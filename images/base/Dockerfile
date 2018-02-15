@@ -27,6 +27,10 @@ echo "export JPY_USER=\$JUPYTERHUB_USER\n\
 export WORK=/home/jupyter/tacc-work\n\
 export SD2_DATA=/home/jupyter/sd2e-community\n\
 export PYTHONUSERBASE=/home/jupyter/tacc-work/jupyter_packages\n" >> /home/jupyter/.bashrc
+# Add activation sripts
+ADD src/activate-python.sh /opt/conda/etc/conda/activate.d/activate-python.sh
+ADD src/activate-python.sh /opt/conda/envs/python2/etc/conda/activate.d/activate-python.sh
+RUN find /opt/conda -type d -name activate.d -exec chmod -R a+rx {} \;
 
 # Add readme
 ADD docs/SD2E_README.md /home/jupyter/SD2E_README.md
