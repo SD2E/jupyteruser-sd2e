@@ -153,7 +153,7 @@ function pushImage {
 	fi
 }
 
-helpStr="Usage: $0 option target\n\nAutomating the build and deploy process for taccsciapps images\n\nPlease specify an option and target\n\nOptions:\n - build\n - test\n - push\n - all\n\nTargets:\n - images/base\n - images/custom"
+helpStr="Usage: $0 option target\n\nAutomating the build and deploy process for taccsciapps images\n\nPlease specify an option and target\n\nOptions:\n - build\n - test\n - push\n - all\n\nTargets:\n - images/base\n - images/sd2e"
 
 # Make sure enough arguments were used
 if [ ! $# -eq 2 ]; then

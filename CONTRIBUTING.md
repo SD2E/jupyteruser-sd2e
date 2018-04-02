@@ -56,13 +56,13 @@ git checkout -b myFeature development
 Please add any external example or configuration files in a descriptive folder in
 
 ```
-images/custom/
+images/sd2e/
 ```
 
 and add a new section at the end of the main `Dockerfile` in
 
 ```
-images/custom/Dockerfile
+images/sd2e/Dockerfile
 ```
 
 for your code immediately **before** the permissiosn section.
