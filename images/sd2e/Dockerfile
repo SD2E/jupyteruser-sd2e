@@ -1,7 +1,7 @@
 #Image: sd2e/jupyteruser-sd2e
-#Version: 0.3.1
+#Version: 0.3.2
 
-FROM sd2e/jupyteruser-base:0.1.1
+FROM sd2e/jupyteruser-base:0.2.0
 
 # Image release
 USER root
@@ -40,7 +40,7 @@ bash -c "export MPLBACKEND=Agg && source activate python2 && pip2 install git+ht
         pip2 install git+https://github.com/probcomp/cgpm.git@v0.1.2 && \
         pip2 install git+https://github.com/probcomp/crosscat.git@v0.1.56.1 && \
         pip2 install git+https://github.com/probcomp/bayeslite.git@v0.3.2 && \
-        pip2 install git+https://github.com/probcomp/iventure.git@v0.2.2" && \
+        pip2 install git+https://github.com/probcomp/iventure.git@v0.2.3" && \
 # Clean cache
 docker-clean
 
@@ -111,6 +111,22 @@ RUN apt-get install -y cmake graphviz && \
 	conda install --quiet --yes python-graphviz && \
 	conda install --quiet --yes -n python2 python-graphviz && \
 	docker-clean
+
+##########################################
+# Support Tensorflow and Keras
+##########################################
+USER root
+LABEL "comment"="Support Tensorflow and Keras" "issue"="SD2E/jupyteruser-sd2e/issues/13"
+RUN bash -c "source activate python2 && \
+pip install https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.6.0-cp27-none-linux_x86_64.whl && \
+pip install keras" && \
+bash -c "source activate root && \
+pip install https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.6.0-cp36-cp36m-linux_x86_64.whl && \
+pip install keras" && \
+	docker-clean
+RUN cd examples && \
+	git clone https://github.com/leriomaggio/deep-learning-keras-tensorflow.git && \
+	cd deep-learning-keras-tensorflow && rm -rf .git
 
 ###############################################
 # Permissions
