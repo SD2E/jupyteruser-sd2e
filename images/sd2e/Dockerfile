@@ -1,7 +1,7 @@
 #Image: sd2e/jupyteruser-sd2e
-#Version: 0.3.1
+#Version: 0.3.2
 
-FROM sd2e/jupyteruser-base:0.1.1
+FROM sd2e/jupyteruser-base:0.2.0
 
 # Image release
 USER root
@@ -36,7 +36,7 @@ conda install -n python2 --quiet --yes flask jsonschema patsy requests six && \
 		gcc_impl_linux-64 gcc_linux-64 \
 		gxx_impl_linux-64 gxx_linux-64 && \
 # Install probcomp software stack
-bash -c "export MPLBACKEND=Agg && source activate python2 && pip2 install git+https://github.com/probcomp/Venturecxx@v0.5.1.1 && \   
+bash -c "export MPLBACKEND=Agg && source activate python2 && pip2 install git+https://github.com/probcomp/Venturecxx@v0.5.1.1 && \
         pip2 install git+https://github.com/probcomp/cgpm.git@v0.1.2 && \
         pip2 install git+https://github.com/probcomp/crosscat.git@v0.1.56.1 && \
         pip2 install git+https://github.com/probcomp/bayeslite.git@v0.3.2 && \
@@ -118,7 +118,7 @@ RUN apt-get install -y cmake graphviz && \
 
 # The notebook is run by the TACC userid, not jupyter,
 # so permissions need to be open
-RUN chown -R jupyter:G-819382 /home/jupyter && \
+RUN chown -R jupyter:${NB_GROUP} /home/jupyter && \
 	chmod 777 /home/jupyter && \
 	find /home/jupyter -type f -exec chmod 666 {} \; && \
 	find /home/jupyter -type d -exec chmod 777 {} \;

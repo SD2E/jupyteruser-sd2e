@@ -1,5 +1,5 @@
 #Image: sd2e/jupyteruser-base
-#Version: 0.2.0
+#Version: 0.2.1
 
 FROM taccsciapps/jupyteruser-base:0.1.2
 LABEL origin="https://bitbucket.org/gzynda/jupyter/src/40adbad7b10b34de715d5a86aec3fcf65e724b70/notebooks/base/jupyter-notebook/Dockerfile?at=CIC-425-image-redesign&fileviewer=file-view-default"
@@ -11,13 +11,20 @@ USER root
 
 # Image release
 ARG image_version=development
-ENV NB_GID=G-819382
+# Parameterize GID
+# 65536 is a dummy value since we now override user UID/GID at launch
+#  using Docker nsmap. This should means it's only important for GIDs not
+#  collide and that g+r(x) permissions are set where needed
+ARG TACC_GID=65536
+ENV NB_GROUP=G-${TACC_GID}
+ENV NB_GID=${TACC_GID}
+
 RUN echo "${image_version}" > /etc/sd2e_jupyteruser-base-release && \
 chmod a+r /etc/sd2e_jupyteruser-base-release && \
 # Make sure Jupyter group == SD2E-Community == 819382
-groupadd --gid 819382 $NB_GID && \
-usermod -a -G $NB_GID jupyter && \
-usermod -g $NB_GID jupyter && \
+groupadd --gid ${NB_GID} ${NB_GROUP} && \
+usermod -a -G ${NB_GROUP} jupyter && \
+usermod -g ${NB_GROUP} jupyter && \
 # Jupyterhub correctly sets JUPYTERHUB_USER
 echo 'PS1="$JUPYTERHUB_USER@\h:\w\$ "' >> /home/jupyter/.bashrc && \
 # allow users to add kernels
@@ -26,6 +33,8 @@ chmod 777 /opt/conda/share/jupyter/kernels && \
 echo "export JPY_USER=\$JUPYTERHUB_USER\n\
 export WORK=/home/jupyter/tacc-work\n\
 export SD2_DATA=/home/jupyter/sd2e-community\n\
+export PROJECTS_DATA=/home/jupyter/sd2e-projects\n\
+export PARTNERS_DATA=/home/jupyter/sd2e-partners\n\
 export PYTHONUSERBASE=/home/jupyter/tacc-work/jupyter_packages\n" >> /home/jupyter/.bashrc
 # Add activation sripts
 ADD src/activate-python.sh /opt/conda/etc/conda/activate.d/activate-python.sh
@@ -46,12 +55,12 @@ RUN conda update --all && conda install -vv --yes --debug -c bioconda bioconduct
 	conda install --yes --quiet biopython && \
 	conda install --yes --quiet -n python2 biopython && \
 # Enable sd2nb sharing service
-cd /root && \ 
+cd /root && \
 	git clone https://github.com/SD2E/sd2nb-app.git && \
 	( cd sd2nb-app && make && make install ) && \
 	rm -rf sd2nb-app && \
-# Enable sd2e-jupyter 
-cd /root && \ 
+# Enable sd2e-jupyter
+cd /root && \
 	git clone https://github.com/SD2E/sd2e-jupyter-ascending.git && \
 	( cd sd2e-jupyter-ascending && make && make install ) && \
 	rm -rf sd2e-jupyter-ascending && \
@@ -128,12 +137,19 @@ ENV JUPYTER_PATH=$HOME/tacc-work/jupyter_packages/share/jupyter:$JUPYTER_PATH
 ENV JUPYTER_WORK=$HOME/tacc-work/jupyter_packages
 
 ###############################################
+# Affiliated projects
+###############################################
+
+ADD src/add-sd2e-groups.sh /tmp/add-sd2e-groups.sh
+RUN bash /tmp/add-sd2e-groups.sh
+
+###############################################
 # Permissions
 ###############################################
 
 # The notebook is run by the TACC userid, not jupyter,
 # so permissions need to be open
-RUN chown -R jupyter:G-819382 /home/jupyter && \
+RUN chown -R jupyter:${NB_GROUP} /home/jupyter && \
 	chmod 777 /home/jupyter && \
 	find /home/jupyter -type f -exec chmod 666 {} \; && \
 	find /home/jupyter -type d -exec chmod 777 {} \;

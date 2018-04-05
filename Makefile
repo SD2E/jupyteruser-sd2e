@@ -17,7 +17,7 @@ help:
 	echo " - release - push images to production environment\n"
 	echo "Targets:"
 	echo " - base - Recipe in images/base"
-	echo " - sd2e - Recipe in images/sd2e which is where all community software should belong"
+	echo " - sd2e - Recipe in images/custom which is where all community software should belong"
 	echo " - singularity - Image for running on TACC HPC\n"
 
 # Make sure image targets are not used as make targets
