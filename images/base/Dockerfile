@@ -20,22 +20,23 @@ ENV NB_GROUP=G-${TACC_GID}
 ENV NB_GID=${TACC_GID}
 
 RUN echo "${image_version}" > /etc/sd2e_jupyteruser-base-release && \
-chmod a+r /etc/sd2e_jupyteruser-base-release && \
-# Make sure Jupyter group == SD2E-Community == 819382
-groupadd --gid ${NB_GID} ${NB_GROUP} && \
-usermod -a -G ${NB_GROUP} jupyter && \
-usermod -g ${NB_GROUP} jupyter && \
+	chmod a+r /etc/sd2e_jupyteruser-base-release
+RUN groupadd --gid ${NB_GID} ${NB_GROUP} && \
+	usermod -a -G ${NB_GROUP} jupyter && \
+	usermod -g ${NB_GROUP} jupyter &&
+
 # Jupyterhub correctly sets JUPYTERHUB_USER
-echo 'PS1="$JUPYTERHUB_USER@\h:\w\$ "' >> /home/jupyter/.bashrc && \
+RUN echo 'PS1="$JUPYTERHUB_USER@\h:\w\$ "' >> /home/jupyter/.bashrc
 # allow users to add kernels
-chmod 777 /opt/conda/share/jupyter/kernels && \
+RUN chmod 777 /opt/conda/share/jupyter/kernels
 # Environment variables
-echo "export JPY_USER=\$JUPYTERHUB_USER\n\
+RUN echo "export JPY_USER=\$JUPYTERHUB_USER\n\
 export WORK=/home/jupyter/tacc-work\n\
 export SD2_DATA=/home/jupyter/sd2e-community\n\
 export PROJECTS_DATA=/home/jupyter/sd2e-projects\n\
 export PARTNERS_DATA=/home/jupyter/sd2e-partners\n\
 export PYTHONUSERBASE=/home/jupyter/tacc-work/jupyter_packages\n" >> /home/jupyter/.bashrc
+
 # Add activation sripts
 ADD src/activate-python.sh /opt/conda/etc/conda/activate.d/activate-python.sh
 ADD src/activate-python.sh /opt/conda/envs/python2/etc/conda/activate.d/activate-python.sh
@@ -51,24 +52,29 @@ ADD examples examples
 ###############################################
 
 # Bioconductor and BioPython
-RUN conda update --all && conda install -vv --yes --debug -c bioconda bioconductor-biocinstaller && \
+RUN conda update --all && conda install --yes -c bioconda bioconductor-biocinstaller && \
 	conda install --yes --quiet biopython && \
 	conda install --yes --quiet -n python2 biopython && \
+	docker-clean
 # Enable sd2nb sharing service
-cd /root && \
+
+RUN cd /root && \
 	git clone https://github.com/SD2E/sd2nb-app.git && \
 	( cd sd2nb-app && make && make install ) && \
 	rm -rf sd2nb-app && \
+	docker-clean
 # Enable sd2e-jupyter
-cd /root && \
+RUN cd /root && \
 	git clone https://github.com/SD2E/sd2e-jupyter-ascending.git && \
 	( cd sd2e-jupyter-ascending && make && make install ) && \
 	rm -rf sd2e-jupyter-ascending && \
+	docker-clean
 # Ubuntu Packages
-apt-get update && \
-    # jq and bsdmainutils->column is required for abaco CLI
+# - jq - required for abaco CLI
+# - bsdmainutils->column - required for abaco CLI \
+#apt-get install -y tree less openjdk-8-jre ca-certificates-java && \
+RUN apt-get update && \
     apt-get install -y tree less jq rsync bsdmainutils && \
-    #apt-get install -y tree less openjdk-8-jre ca-certificates-java && \
     docker-clean
 # Replace stock Agave CLI with SD2E-customized tooling
 ADD src/configuration.rc configuration.rc
@@ -78,13 +84,13 @@ RUN git clone https://github.com/SD2E/sd2e-cli.git && \
 	make install && rm -rf /opt/cli && rm -rf $HOME/sd2e-cli && \
 	mv /home/jupyter/sd2e-cloud-cli /opt/cli && \
 	chmod -R a+rX /opt/cli && chmod -R a+x /opt/cli/bin && \
+	docker-clean
 # Spark 2.2.1 and pyspark
 #cd /usr/local && \
 #        curl http://apache.claz.org/spark/spark-2.2.1/spark-2.2.1-bin-hadoop2.7.tgz | tar -xzf - && \
 #        mv spark-2.2.1-bin-hadoop2.7 spark && \
 #        conda install --yes pyspark && \
 #        conda install -n python2 --yes pyspark && \
-docker-clean
 #ENV SPARK_HOME=/usr/local/spark
 
 ###############################################
