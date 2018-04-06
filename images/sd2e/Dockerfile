@@ -26,24 +26,27 @@ USER root
 LABEL "comment"="Support for Open Probabilistic Programming Stack" "issue"="SD2E/jupyteruser-sd2e/issues/2"
 # Libraries
 RUN apt-get update && \
-    apt-get install -y libboost-all-dev libgsl0-dev ccache && \
-    apt-get clean && \
+	apt-get install -y libboost-all-dev libgsl0-dev ccache && \
+	apt-get clean && \
+	docker-clean
 # Install dependencies and remove anaconda toolchain
-conda install -n python2 --quiet --yes flask jsonschema patsy requests six && \
+RUN conda install -n python2 --quiet --yes flask jsonschema patsy requests six && \
 	conda install -n python2 -c conda-forge apsw && \
 	conda uninstall -n python2 --yes \
 		binutils_impl_linux-64 binutils_linux-64 \
 		gcc_impl_linux-64 gcc_linux-64 \
 		gxx_impl_linux-64 gxx_linux-64 && \
+	docker-clean
 # Install probcomp software stack
-bash -c "export MPLBACKEND=Agg && source activate python2 && pip2 install git+https://github.com/probcomp/Venturecxx@v0.5.1.1 && \   
+RUN bash -c "export MPLBACKEND=Agg && source activate python2 && \
+	pip2 install git+https://github.com/probcomp/Venturecxx@v0.5.1.1 && \   
         pip2 install git+https://github.com/probcomp/cgpm.git@v0.1.2 && \
         pip2 install git+https://github.com/probcomp/crosscat.git@v0.1.56.1 && \
         pip2 install git+https://github.com/probcomp/bayeslite.git@v0.3.2 && \
         pip2 install git+https://github.com/probcomp/iventure.git@v0.2.3" && \
-# Clean cache
-docker-clean
-
+	rm -rf .ccache && \
+	docker-clean
+# Grab latest example notebooks
 RUN mkdir -p /home/jupyter/examples/probcomp && \
 	cd /home/jupyter/examples/probcomp && \
 	curl http://probcomp-workshop-materials.s3.amazonaws.com/latest.tgz | tar -xzf -
@@ -63,6 +66,7 @@ RUN mkdir /opt/common-lisp && \
     git clone git://git.code.sf.net/p/sbcl/sbcl && \
     cd sbcl && \
     git checkout tags/sbcl-1.4.3 && \
+    export SBCL_MAKE_JOBS="-j $(nproc --all)" && \
     sh make.sh && rm -rf .git && \
     cd /opt/common-lisp/sbcl && \
     sh install.sh && \
