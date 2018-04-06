@@ -23,7 +23,7 @@ RUN echo "${image_version}" > /etc/sd2e_jupyteruser-base-release && \
 	chmod a+r /etc/sd2e_jupyteruser-base-release
 RUN groupadd --gid ${NB_GID} ${NB_GROUP} && \
 	usermod -a -G ${NB_GROUP} jupyter && \
-	usermod -g ${NB_GROUP} jupyter &&
+	usermod -g ${NB_GROUP} jupyter
 
 # Jupyterhub correctly sets JUPYTERHUB_USER
 RUN echo 'PS1="$JUPYTERHUB_USER@\h:\w\$ "' >> /home/jupyter/.bashrc

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 while read -r nb_gid nb_group ; do
     echo "Adding ${nb_gid}:${nb_group}"

@@ -38,12 +38,9 @@ RUN conda install -n python2 --quiet --yes flask jsonschema patsy requests six &
 		gxx_impl_linux-64 gxx_linux-64 && \
 	docker-clean
 # Install probcomp software stack
-<<<<<<< HEAD
-bash -c "export MPLBACKEND=Agg && source activate python2 && pip2 install git+https://github.com/probcomp/Venturecxx@v0.5.1.1 && \
-=======
+
 RUN bash -c "export MPLBACKEND=Agg && source activate python2 && \
 	pip2 install git+https://github.com/probcomp/Venturecxx@v0.5.1.1 && \
->>>>>>> development
         pip2 install git+https://github.com/probcomp/cgpm.git@v0.1.2 && \
         pip2 install git+https://github.com/probcomp/crosscat.git@v0.1.56.1 && \
         pip2 install git+https://github.com/probcomp/bayeslite.git@v0.3.2 && \
