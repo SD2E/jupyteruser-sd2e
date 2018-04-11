@@ -25,7 +25,7 @@ help:
 	@:
 
 docker:
-	docker info &> /dev/null && \
+	docker info 1> /dev/null 2> /dev/null && \
 	if [ ! $$? -eq 0 ]; then \
 		echo "\n[ERROR] Could not communicate with docker daemon. You may need to run with sudo.\n"; \
 		exit 1; \
