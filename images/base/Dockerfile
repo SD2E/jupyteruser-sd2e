@@ -56,7 +56,7 @@ ARG AGAVE_GID=G-816877
 ENV NB_USER=jupyter \
     NB_GID=${TACC_GID} \
     NB_GROUP=${TACC_GID} \
-    SHELL=/bin/bashh
+    SHELL=/bin/bash
 RUN groupadd --gid 816877 ${AGAVE_GID} && \
     useradd --uid 458981 --gid ${AGAVE_GID} -m --home /home/jupyter --shell /bin/bash $NB_USER && \
     groupadd --gid ${NB_GID} ${NB_GROUP} && \
