@@ -282,3 +282,8 @@ RUN MPLBACKEND=Agg $CONDA_DIR/envs/python2/bin/python -c "import matplotlib.pypl
 # build matplotlib python3 font cache
 RUN MPLBACKEND=Agg python -c "import matplotlib.pyplot" && \
 	docker-clean
+
+
+# Fix git
+COPY src/setup-git-user.sh $HOME/.setup-git-user.sh
+RUN echo "if [ -z \"\$GIT_USER_CONFIGURED\" ]; then source \$HOME/.setup-git-user.sh; fi" >> $HOME/.bashrc
