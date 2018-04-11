@@ -223,6 +223,13 @@ RUN cd /root && \
 	( cd sd2e-jupyter-ascending && make && make install ) && \
 	rm -rf sd2e-jupyter-ascending && \
 	docker-clean
+# Add hub
+RUN cd /root && \
+    curl -skL -O "https://github.com/github/hub/releases/download/v2.3.0-pre10/hub-linux-amd64-2.3.0-pre10.tgz" && \
+    tar zxf hub-linux-amd64-2.3.0-pre10.tgz && \
+    cd hub-linux-amd64-2.3.0-pre10 && \
+    ./install && \
+    cd /root && rm -rf hub-linux-amd64-2.3.0-pre10*
 
 ###################################################################
 # Add entrypoint
@@ -285,5 +292,5 @@ RUN MPLBACKEND=Agg python -c "import matplotlib.pyplot" && \
 
 
 # Fix git
-COPY src/setup-git-user.sh $HOME/.setup-git-user.sh
-RUN echo "if [ -z \"\$GIT_USER_CONFIGURED\" ]; then source \$HOME/.setup-git-user.sh; fi" >> $HOME/.bashrc
+ADD src/setup-git-user.sh /home/jupyter/.config/setup-git-user.sh
+RUN echo "if [ -z \"\$GIT_USER_CONFIGURED\" ]; then source \$HOME/.config/setup-git-user.sh; fi" >> $HOME/.bashrc
