@@ -9,8 +9,10 @@
 (ql:quickload "alexandria")
 (ql:quickload "trivial-features")
 (ql:quickload "babel")
+(ql:quickload "ironclad")
 
 ;; Run the kernel script once to get all of the required packages installed
 ;; so that that pacakges aren't installed when running starting the notebook.
 (load "cl-jupyter/cl-jupyter.lisp")
+(ql:quickload "cl-jupyter")
 (quit)

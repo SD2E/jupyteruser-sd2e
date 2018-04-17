@@ -94,7 +94,8 @@ function testImage {
 		EIP=$(dig +short myip.opendns.com @resolver1.opendns.com)
 		ed "Local Address: http://localhost:8888"
 		ed "External Address: http://${EIP}:8888"
-		ed "docker run --rm -p 8888:8888 ${IMG}:${VERSION} start-notebook.sh"
+		# Added -u flag to test as non-existent user
+		ed "docker run -u 1337 --rm -p 8888:8888 ${IMG}:${VERSION} start-notebook.sh"
 		docker run --rm -p 8888:8888 ${IMG}:${VERSION} start-notebook.sh
 		if [ ! $? -eq 0 ]; then
 			ee "Notebook could not launch"

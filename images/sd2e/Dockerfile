@@ -1,7 +1,10 @@
 #Image: sd2e/jupyteruser-sd2e
-#Version: 0.3.2
+#Version: 0.3.3
 
-FROM sd2e/jupyteruser-base:0.2.1
+FROM sd2e/jupyteruser-base:0.2.2
+
+# Convenience variable
+ARG CONDA_ARGS="--quiet --no-update-deps --yes"
 
 # Image release
 USER root
@@ -14,8 +17,10 @@ RUN echo "${image_version}" > /etc/sd2e_jupyteruser-sd2e-release && \
 ##########################################
 USER root
 LABEL "comment"="Support for plotly igraph and networkx" "issue"="SD2E/jupyteruser-sd2e/issues/3"
-RUN conda install --quiet --yes python-igraph plotly networkx && \
-	conda install --quiet --yes -n python2 python-igraph plotly networkx && \
+RUN conda install ${CONDA_ARGS} plotly networkx && \
+	bash -c "source activate base && pip install python-igraph" && \
+	conda install ${CONDA_ARGS} -n python2 plotly networkx && \
+	bash -c "source activate python2 && pip install python-igraph" && \
 	docker-clean
 
 ##########################################
@@ -24,28 +29,24 @@ RUN conda install --quiet --yes python-igraph plotly networkx && \
 USER root
 
 LABEL "comment"="Support for Open Probabilistic Programming Stack" "issue"="SD2E/jupyteruser-sd2e/issues/2"
-# Libraries
-RUN apt-get update && \
-	apt-get install -y libboost-all-dev libgsl0-dev ccache && \
-	apt-get clean && \
-	docker-clean
-# Install dependencies and remove anaconda toolchain
-RUN conda install -n python2 --quiet --yes flask jsonschema patsy requests six && \
-	conda install -n python2 -c conda-forge apsw && \
-	conda uninstall -n python2 --yes \
-		binutils_impl_linux-64 binutils_linux-64 \
-		gcc_impl_linux-64 gcc_linux-64 \
-		gxx_impl_linux-64 gxx_linux-64 && \
+
+# Install run dependencies
+RUN apt-get update && apt-get install -yq --no-install-recommends libgsl0-dev && \
+	conda install -n python2 ${CONDA_ARGS} flask jsonschema patsy requests six && \
+	conda install -n python2 ${CONDA_ARGS} -c conda-forge apsw && \
 	docker-clean
 # Install probcomp software stack
-
+### Make sure to remove build deps
+RUN apt-get update && apt-get install -y --no-install-recommends libboost-all-dev ccache
 RUN bash -c "export MPLBACKEND=Agg && source activate python2 && \
-	pip2 install git+https://github.com/probcomp/Venturecxx@v0.5.1.1 && \
-        pip2 install git+https://github.com/probcomp/cgpm.git@v0.1.2 && \
-        pip2 install git+https://github.com/probcomp/crosscat.git@v0.1.56.1 && \
-        pip2 install git+https://github.com/probcomp/bayeslite.git@v0.3.2 && \
-        pip2 install git+https://github.com/probcomp/iventure.git@v0.2.3" && \
+	pip install git+https://github.com/probcomp/Venturecxx@v0.5.1.1 && \
+        pip install git+https://github.com/probcomp/cgpm.git@v0.1.2 && \
+        pip install git+https://github.com/probcomp/crosscat.git@v0.1.56.1 && \
+        pip install git+https://github.com/probcomp/bayeslite.git@v0.3.2 && \
+        pip install git+https://github.com/probcomp/iventure.git@v0.2.3" && \
 	rm -rf .ccache && \
+	apt-get --purge remove -y libboost-all-dev ccache && \
+	apt-get --purge -y autoremove && \
 	docker-clean
 # Grab latest example notebooks
 RUN mkdir -p /home/jupyter/examples/probcomp && \
@@ -56,32 +57,27 @@ RUN mkdir -p /home/jupyter/examples/probcomp && \
 ####  Common Lisp Kernel Setup Begin  ####
 ##########################################
 
-# Get sbcl from the package manage and use it to build
-# the sbcl 1.4.0 from source. The version from the package
-# manager is not the current version.
-RUN mkdir /opt/common-lisp && \
-    apt-get update && \
-    apt-get install -y sbcl libzmq3-dev && \
-    apt-get clean && \
-    cd /opt/common-lisp && \
-    git clone git://git.code.sf.net/p/sbcl/sbcl && \
-    cd sbcl && \
-    git checkout tags/sbcl-1.4.3 && \
-    export SBCL_MAKE_JOBS="-j $(nproc --all)" && \
-    sh make.sh && rm -rf .git && \
-    cd /opt/common-lisp/sbcl && \
-    sh install.sh && \
-    apt-get purge -y sbcl   # Uninstall the version from apt-get
+ENV CL_PREFIX=/opt/common-lisp
+ARG CLV=1.4.6-x86-64-linux
+# Install dependency
+RUN apt-get update && apt-get install -yq --no-install-recommends libzmq3-dev && \
+	docker-clean
+# Install SBCL
+RUN curl -L prdownloads.sourceforge.net/sbcl/sbcl-${CLV}-binary.tar.bz2 | tar -xjf - && \
+	( cd sbcl-${CLV} && INSTALL_ROOT=${CL_PREFIX} bash install.sh ) && \
+	rm -rf sbcl-${CLV} && \
+	docker-clean
+# Set env variable for sbcl http://www.sbcl.org/getting.html
+ENV SBCL_HOME=${CL_PREFIX}/lib/sbcl
+ENV PATH=${CL_PREFIX}/bin:${PATH}
 
-COPY common-lisp/ql_setup.lisp /opt/common-lisp/ql_setup.lisp
+COPY common-lisp/ql_setup.lisp ${CL_PREFIX}/ql_setup.lisp
 
 # Install the common lisp jupyter kernel
-RUN cd /opt/common-lisp/ && \
+RUN cd ${CL_PREFIX} && \
     git clone https://github.com/fredokun/cl-jupyter.git && \
-    cd cl-jupyter && rm -rf .git && \
-    python ./install-cl-jupyter.py && \
-    cd /opt/common-lisp && \
-    curl -O https://beta.quicklisp.org/quicklisp.lisp && \
+    ( cd cl-jupyter && rm -rf .git && ${CONDA_DIR}/bin/python ./install-cl-jupyter.py ) && \
+    curl -LO https://beta.quicklisp.org/quicklisp.lisp && \
     sbcl --load ql_setup.lisp && \
     rm quicklisp.lisp ql_setup.lisp
 
@@ -91,20 +87,23 @@ RUN cd /opt/common-lisp/ && \
 COPY common-lisp/sbclrc /home/jupyter/.sbclrc
 
 # Move the kernel json file to the correct location
-RUN mkdir /opt/conda/share/jupyter/kernels/lisp && \
-    mv $HOME/.ipython/kernels/lisp/kernel.json /opt/conda/share/jupyter/kernels/lisp && \
-    chmod -R a+rwX /opt/conda/share/jupyter/kernels/lisp && \
-    rm -rf ${HOME}/.ipython && docker-clean
+RUN cp -r $HOME/.ipython/kernels/lisp ${CONDA_DIR}/share/jupyter/kernels/ && \
+    rm -rf $HOME/.ipython && \
+    chmod -R a+rX ${CONDA_DIR}/share/jupyter/kernels/lisp && \
+    docker-clean
 
 COPY examples/common-lisp /home/jupyter/examples/common-lisp
+
+USER jupyter
+RUN sbcl --load ${CL_PREFIX}/cl-jupyter/cl-jupyter.lisp
 
 ##########################################
 # pyemd support
 ##########################################
 USER root
 LABEL "comment"="support for pyemd" "issue"="SD2E/jupyteruser-sd2e/issues/8"
-RUN conda install --quiet --yes pyemd && \
-	conda install --quiet --yes -n python2 pyemd && \
+RUN conda install ${CONDA_ARGS} pyemd && \
+	conda install ${CONDA_ARGS} -n python2 pyemd && \
 	docker-clean
 
 ##########################################
@@ -112,9 +111,9 @@ RUN conda install --quiet --yes pyemd && \
 ##########################################
 USER root
 LABEL "comment"="Support DSGRN code" "issue"="SD2E/jupyteruser-sd2e/issues/9"
-RUN apt-get install -y cmake graphviz && \
-	conda install --quiet --yes python-graphviz && \
-	conda install --quiet --yes -n python2 python-graphviz && \
+RUN apt-get update && apt-get install -yq --no-install-recommends cmake graphviz && \
+	conda install ${CONDA_ARGS} python-graphviz && \
+	conda install ${CONDA_ARGS} -n python2 python-graphviz && \
 	docker-clean
 
 ##########################################
@@ -122,16 +121,14 @@ RUN apt-get install -y cmake graphviz && \
 ##########################################
 USER root
 LABEL "comment"="Support Tensorflow and Keras" "issue"="SD2E/jupyteruser-sd2e/issues/13"
-RUN bash -c "source activate python2 && \
-pip install https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.6.0-cp27-none-linux_x86_64.whl && \
-pip install keras" && \
-bash -c "source activate root && \
-pip install https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.6.0-cp36-cp36m-linux_x86_64.whl && \
-pip install keras" && \
+RUN conda install ${CONDA_ARGS} 'tensorflow=1.6*' keras theano && \
+	conda install ${CONDA_ARGS} -n python2 'tensorflow=1.6*' keras theano && \
 	docker-clean
 RUN cd examples && \
 	git clone https://github.com/leriomaggio/deep-learning-keras-tensorflow.git && \
 	cd deep-learning-keras-tensorflow && rm -rf .git
+# Necessary for theano
+ENV MKL_THREADING_LAYER=GNU
 
 ###############################################
 # Permissions
