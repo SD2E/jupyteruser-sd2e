@@ -217,8 +217,7 @@ RUN git clone https://github.com/SD2E/sd2e-cli.git && \
 	git submodule update --init --recursive && \
 	make && make install && \
 	cd ../ && rm -rf sd2e-cli && \
-	mv /root/sd2e-cloud-cli /opt/cli && \
-	ls -a /root && rm -rf /root/* /root/.[^\.]* && \
+	mv ${HOME}/sd2e-cloud-cli /opt/cli && \
 	chmod -R a+rX /opt/cli && chmod -R a+x /opt/cli/bin && \
 	docker-clean
 # add cli to PATH
@@ -227,7 +226,7 @@ ENV PATH=$PATH:/opt/cli/bin
 # install agavepy
 RUN bash -c "source activate base && pip install git+https://github.com/TACC/agavepy.git" && \
 	bash -c "source activate python2 && pip install git+https://github.com/TACC/agavepy.git" && \
-	docker-clean && find /root
+	docker-clean
 # Enable sd2nb sharing service
 RUN cd /root && \
 	git clone https://github.com/SD2E/sd2nb-app.git && \
