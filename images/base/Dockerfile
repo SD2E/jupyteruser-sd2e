@@ -65,7 +65,8 @@ RUN groupadd --gid 816877 ${AGAVE_GID} && \
     usermod -a -G ${NB_GROUP} jupyter
 # While not ideal, this is required since the users that are injected
 # into the container do not exist.
-ENV HOME=/home/jupyter
+ENV HOME=/home/jupyter \
+    USER=jupyter
 # Make primary group TACC_GID
 RUN usermod -g ${NB_GROUP} jupyter
 
@@ -80,6 +81,8 @@ mkdir /etc/jupyter && cd /etc/jupyter && wget -q ${BURL}/jupyter_notebook_config
 fix-permissions /etc/jupyter /usr/local/bin
 
 # Fix git for all users
+# profile is only loaded in an interactive login shell
+# - https://askubuntu.com/questions/438150/scripts-in-etc-profile-d-being-ignored/438170#438170
 ADD src/setup-git-user.sh /etc/profile.d/setup-git-user.sh
 RUN chmod a+rx /etc/profile.d/setup-git-user.sh
 
@@ -97,7 +100,8 @@ export WORK=/home/jupyter/tacc-work\n\
 export SD2_DATA=/home/jupyter/sd2e-community\n\
 export PROJECTS_DATA=/home/jupyter/sd2e-projects\n\
 export PARTNERS_DATA=/home/jupyter/sd2e-partners\n\
-export PYTHONUSERBASE=/home/jupyter/tacc-work/jupyter_packages\n" >> /home/jupyter/.bashrc
+export PYTHONUSERBASE=/home/jupyter/tacc-work/jupyter_packages\n\n\
+[ -e /etc/profile.d/setup-git-user.sh ] && . /etc/profile.d/setup-git-user.sh" >> /home/jupyter/.bashrc
 
 # Add readme
 ADD docs/SD2E_README.md /home/jupyter/SD2E_README.md
@@ -119,11 +123,12 @@ ENV PATH=${CONDA_DIR}/bin:$PATH
 RUN mkdir $CONDA_DIR && chmod -R a+rX $CONDA_DIR && \
     wget --quiet https://repo.continuum.io/miniconda/Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh && \
     bash Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh -f -b -p $CONDA_DIR && \
-    rm Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh
-RUN docker-clean && conda config --system --set auto_update_conda false && \
+    rm Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh && \
+    conda config --system --set auto_update_conda false && \
     conda config --system --set show_channel_urls true && \
     conda update -n base conda && \
     conda update --all --quiet --yes && \
+    rm -rf ${CONDA_DIR}/pkgs/* && \
     docker-clean
 ###################################################################
 # Create python3 environment
@@ -131,8 +136,8 @@ RUN docker-clean && conda config --system --set auto_update_conda false && \
 
 # Add packages to python3 environment
 ## installing r-essentials without r-base breaks gcc
-RUN conda install --yes \
-    notebook jupyter_console nbconvert ipykernel ipywidgets \
+RUN conda install --yes --no-update-deps -c defaults -c conda-forge \
+    jupyter \
     'numpy=1.14*' \
     'scipy=1.0*' \
     'cython=0.27*' \
@@ -142,8 +147,8 @@ RUN conda install --yes \
     'r-essentials' 'r-base' \
     'scikit-learn=0.19*' \
     'scikit-image=0.13*' \
+    jupyterhub \
     'biopython' && \
-conda install -c defaults -c conda-forge --no-update-deps jupyterhub && \
 conda create --yes -n python2 \
     'python=2.7' \
     'ipykernel' \
