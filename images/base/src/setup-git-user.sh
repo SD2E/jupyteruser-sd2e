@@ -1,4 +1,4 @@
-if [ -z "$GIT_COMMITTER_EMAIL"]; then
+if [ -z "$GIT_COMMITTER_EMAIL" ]; then
 	# Refresh agave token
 	if [ -e $HOME/.agave/current ]; then
 		auth-tokens-refresh -S &>/dev/null || true

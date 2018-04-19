@@ -38,7 +38,8 @@ RUN apt-get update && \
     apt-get install -yq --no-install-recommends \
         bzip2 unzip ca-certificates build-essential \
         emacs-nox vim-nox git wget openssh-client curl \
-        tree less jq rsync bsdmainutils && \
+        tree less jq rsync bsdmainutils locales && \
+    locale-gen en_US.UTF-8 && \
     docker-clean
 ###################################################################
 # Create jupyter user
