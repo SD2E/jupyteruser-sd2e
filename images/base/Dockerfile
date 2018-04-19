@@ -39,7 +39,10 @@ RUN apt-get update && \
         bzip2 unzip ca-certificates build-essential \
         emacs-nox vim-nox git wget openssh-client curl \
         tree less jq rsync bsdmainutils locales && \
-    locale-gen en_US.UTF-8 && \
+    echo "LANG=\"en_US.UTF-8\"\n\
+LANGUAGE=\"en_US.UTF-8\"\n\
+LC_ALL=\"en_US.UTF-8\"" >> /etc/default/locale && \
+    echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && locale-gen && \
     docker-clean
 ###################################################################
 # Create jupyter user
@@ -67,7 +70,10 @@ RUN groupadd --gid 816877 ${AGAVE_GID} && \
 # While not ideal, this is required since the users that are injected
 # into the container do not exist.
 ENV HOME=/home/jupyter \
-    USER=jupyter
+    USER=jupyter \
+    LC_ALL=en_US.UTF-8 \
+    LANG=en_US.UTF-8 \
+    LANGUAGE=en_US.UTF-8
 # Make primary group TACC_GID
 RUN usermod -g ${NB_GROUP} jupyter
 
