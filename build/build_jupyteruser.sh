@@ -94,7 +94,8 @@ function testImage {
 		EIP=$(dig +short myip.opendns.com @resolver1.opendns.com)
 		ed "Local Address: http://localhost:8888"
 		ed "External Address: http://${EIP}:8888"
-		ed "docker run --rm -p 8888:8888 ${IMG}:${VERSION} start-notebook.sh"
+		# Added -u flag to test as non-existent user
+		ed "docker run -u 1337 --rm -p 8888:8888 ${IMG}:${VERSION} start-notebook.sh"
 		docker run --rm -p 8888:8888 ${IMG}:${VERSION} start-notebook.sh
 		if [ ! $? -eq 0 ]; then
 			ee "Notebook could not launch"
@@ -153,7 +154,7 @@ function pushImage {
 	fi
 }
 
-helpStr="Usage: $0 option target\n\nAutomating the build and deploy process for taccsciapps images\n\nPlease specify an option and target\n\nOptions:\n - build\n - test\n - push\n - all\n\nTargets:\n - images/base\n - images/custom"
+helpStr="Usage: $0 option target\n\nAutomating the build and deploy process for taccsciapps images\n\nPlease specify an option and target\n\nOptions:\n - build\n - test\n - push\n - all\n\nTargets:\n - images/base\n - images/sd2e"
 
 # Make sure enough arguments were used
 if [ ! $# -eq 2 ]; then

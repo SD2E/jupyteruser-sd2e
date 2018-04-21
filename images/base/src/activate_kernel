@@ -1,0 +1,17 @@
+#!/bin/bash
+
+function usage {
+	echo -e "\n  Usage: activate_kernel conda_env conn_file\n" 1>&2;
+}
+function ee {
+	# Echos to STDERR
+	echo -e "[ERROR] $@" 1>&2;
+	usage
+	exit 1
+}
+
+[ ! -n "$1" ] && ee "Please specify a conda environment"
+[ ! -n "$2" ] && ee "Please specify a connection file"
+
+source activate $1
+python -m ipykernel_launcher -f $2

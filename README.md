@@ -4,6 +4,7 @@
 
 * Jupyter Notebook \(v5.2.0\)server
 * Conda Python 3.4.x and Python 2.7.x environments
+  * Custom environments and kernels now supported through `Advanced Jupyter.ipynb` notebook
 * Pre-installed python packages (highlights)
   * pandas
   * matplotlib 2.1.2
@@ -16,6 +17,7 @@
 * Plotly, igraph, networkx, graphviz for graphs and plots
 * MIT's [Open Probabilistic Programming Stack](http://probcomp.org/)
 * [Common Lisp kernel and stack](http://www.sbcl.org/)
+  * v1.4.6 Now installed as binary
 * Bioconda and Bioconductor
 * BioPython
 * Git
