@@ -2,6 +2,22 @@
 
 All notable changes to this project are to be documented in this file.
 
+## Version 0.3.3
+
+ - Added hub https://github.com/github/hub
+ - Create persistent environments
+   - `conda create -y -p $LOCAL_ENVS/tabsAreGreat python=2.7 ipykernel 'scipy==0.16.0'`
+ - Discover persistent environments
+   - `conda env list`
+ - Create a new kernel
+   - `$LOCAL_ENVS/tabsAreGreat/bin/python -m ipykernel install --prefix $JUPYTER_WORK --name tabsAreGreat --display-name "tabs are great"`
+   - Refresh main page
+ - Added ML modules
+   - Tensorflow 1.6
+   - Theano
+   - Keras
+ - Optimized image size by starting from ubuntu base
+
 ## Version 0.3.1
 
  - Added `PYTHONUSERBASE` variable, which points at `tacc-work/jupyter_packages`, and allows for persistent local pip installs
