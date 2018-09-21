@@ -1,5 +1,5 @@
 #Image: sd2e/jupyteruser-base
-#Version: 0.2.2
+#Version: 0.2.3
 
 FROM ubuntu:xenial
 LABEL maintainer="Greg Zynda <gzynda@tacc.utexas.edu>"
@@ -30,11 +30,13 @@ EXPOSE 8888
 # Dependencies
 ###################################################################
 USER root
-# Install dependencies
-# - jq - required for abaco CLI
+# Install dependencies & security updates
+# - jq - required for abaco CL
 # - bsdmainutils->column - required for abaco CLI \
-# - Install *-nox (non-GUI) versions of tools when available 
+# - Install *-nox (non-GUI) versions of tools when available
 RUN apt-get update && \
+    grep security /etc/apt/sources.list > /etc/apt/security.sources.list && \
+    apt-get upgrade -o Dir::Etc::SourceList=/etc/apt/security.sources.list && \
     apt-get install -yq --no-install-recommends \
         bzip2 unzip ca-certificates build-essential \
         emacs-nox vim-nox git wget openssh-client curl \
@@ -111,7 +113,8 @@ export PYTHONUSERBASE=/home/jupyter/tacc-work/jupyter_packages\n\n\
 [ -e /etc/profile.d/setup-git-user.sh ] && . /etc/profile.d/setup-git-user.sh" >> /home/jupyter/.bashrc
 
 # Add readme
-ADD docs/SD2E_README.md /home/jupyter/SD2E_README.md
+# ADD docs/SD2E_README.md /home/jupyter/SD2E_README.md
+ADD docs/SD2E_README.ipynb /home/jupyter/SD2E_README.ipynb
 # Add examples
 ADD examples examples
 # Add R kernel
