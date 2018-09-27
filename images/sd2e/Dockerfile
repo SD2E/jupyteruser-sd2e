@@ -141,4 +141,7 @@ RUN chown -R jupyter:${NB_GROUP} /home/jupyter && \
 	find /home/jupyter -type f -exec chmod 666 {} \; && \
 	find /home/jupyter -type d -exec chmod 777 {} \;
 
+RUN conda install -c conda-forge jupyterlab
+RUN jupyter labextension install @jupyterlab/hub-extension
+
 USER jupyter
