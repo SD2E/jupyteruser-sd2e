@@ -2,33 +2,30 @@
 
 ## Fileystem Map
 
-```
+```bash
 /home/jupyter
-├── cli - TACC cloud CLI
 ├── examples - Exemplar Jupyter notebooks
 ├── sd2e-community - SD2 primary project data
-├── reference
-| └── examples
-|  └── jupyter - Additional data sets and exemplar notebooks
 ├── sd2e-partners - Isolated storage for external partners
 ├── sd2e-projects - Isolated storage for approved projects
 └── tacc-work - 1TB of persistent storage at TACC
 ```
 
+* Data created in $HOME (/home/jupyter) will NOT be saved
 * Store persistent data, such as notebooks or data sets in `tacc-work`
     * 1+ TB storage quota
     * High performance accessible across all TACC systems
     * Formerly _mydata_
     * Available via Agave API as `data-tacc-work-<username>`
 * Access (read-only) primary project data in sd2e-community
-    * Available via Agave API as data-sd2e-community
-* Collaborate using the data-sd2e-projects-users Agave data resource
+    * Available via Agave API as `data-sd2e-community`
+* Collaborate using the `data-sd2e-projects-users` Agave data resource
 
 ## Sharing Notebooks
 
 * Find and share Jupyter notebooks with the sd2nb command in the Terminal
     * sd2nb usage
-    
+
 ## Customizing the Jupyter environment
 
 The Jupyter environment now supports persistent custom conda environments and jupyter kernels. This means you no longer have to submit an issue and wait on us if you need a specialized notebook environment, accelerating your work.
@@ -37,7 +34,7 @@ The Jupyter environment now supports persistent custom conda environments and ju
 
 By default, we have two conda environments
 
-```
+```bash
 $ conda env list
 
 # conda environments:
@@ -48,8 +45,8 @@ python2                  /opt/conda/envs/python2
 
 New persistent environments, which will not be affected by server restarts, can be installed to a persistent location as follows
 
-```
-conda create -y -p $LOCAL_ENVS/tabsAreGreat python=2.7 ipykernel 'scipy==0.16.0'
+```bash
+$ conda create -y -p $LOCAL_ENVS/tabsAreGreat python=2.7 ipykernel 'scipy==0.16.0'
 
 # -y              - respond yes to all questions
 # -p PATH         - prefix/name
@@ -60,7 +57,7 @@ conda create -y -p $LOCAL_ENVS/tabsAreGreat python=2.7 ipykernel 'scipy==0.16.0'
 
 In this example, we created a new python 2 (`python=2.7`) environment called `tabsAreGreat` in the `$LOCAL_ENVS` directory that contains the `ipykernel` and `scipy==0.16.0` modules and all necessary dependencies.
 
-```
+```bash
 $ conda env list
 
 # conda environments:
@@ -72,8 +69,8 @@ python2                  /opt/conda/envs/python2
 
 This environment can now be utilized on the command line by entering the environment
 
-```
-source activate tabsAreGreat
+```bash
+$ conda activate tabsAreGreat
 ```
 
 ### New Jupyter kernels
@@ -84,8 +81,8 @@ If you want to use your new envrionment with a notebook, you but create a corres
 
 To create the kernel file, you need to call the `ipykernel` module using the absolute path to your custom python environment. The kernel should be installed (`--prefix`) to `$JUPYTER_WORK` which our Jupyter environment will automatically crawl for new kernels. The name (`--name`) should match your conda environment name (no spaces), but your display name should be human-readable and can contain spaces.
 
-```
-$LOCAL_ENVS/tabsAreGreat/bin/python -m ipykernel install \
+```bash
+$ $LOCAL_ENVS/tabsAreGreat/bin/python -m ipykernel install \
     --prefix $JUPYTER_WORK \
     --name tabsAreGreat \
     --display-name "tabs are great"
@@ -106,28 +103,28 @@ Just remember that this kernel is specific to you and any collaborators will nee
 
 When you no longer need a Jupyter kernel you created, you can remove it as follows
 
-```
-rm -rf $JUPYTER_WORK/share/jupyter/kernels/tabsaregreat
+```bash
+$ rm -rf $JUPYTER_WORK/share/jupyter/kernels/tabsaregreat
 ```
 
 You can also remove all custom Jupyter kernels using
 
-```
-rm -rf $JUPYTER_WORK/share/jupyter/kernels
+```bash
+$ rm -rf $JUPYTER_WORK/share/jupyter/kernels
 ```
 
 ### Removing Conda environments
 
 When you no longer need a custom conda environment, you can delete a specific one
 
-```
-rm -rf $LOCAL_ENVS/tabsAreGreat
+```bash
+$ rm -rf $LOCAL_ENVS/tabsAreGreat
 ```
 
 or all of them
 
-```
-rm -rf $LOCAL_ENVS
+```bash
+$ rm -rf $LOCAL_ENVS
 ```
 
 ## API integration
@@ -139,10 +136,15 @@ Learn more about collaborating using Agave Cloud APIs
 - http://sd2e.org/api-user-guide/
 
 Latest notebook documentation
-- https://github.com/SD2E/jupyteruser-sd2e/README.md
+- https://github.com/SD2E/jupyteruser-sd2e/blob/master/README.md
 
 Latest notebook issue log
 - https://github.com/SD2E/jupyteruser-sd2e/issues
 
-Get Help
-- support@sd2e.org
+Learn more about sharing notebooks
+- https://github.com/SD2E/sd2nb-app/blob/master/README.md
+
+## Get Help
+- Web: https://sd2e.org/tickets/
+- Email: support@sd2e.org
+- Slack: https://sd2e.slack.com/messages/cyberinfrastructure

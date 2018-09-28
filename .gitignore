@@ -8,3 +8,4 @@
 test/work/*
 images/sd2e/VERSION
 /images/sd2e/jupyteruser-sd2e_release
+.python-version

@@ -1,7 +1,7 @@
 #Image: sd2e/jupyteruser-sd2e
-#Version: 0.3.3
+#Version: 0.3.4
 
-FROM sd2e/jupyteruser-base:0.2.2
+FROM sd2e/jupyteruser-base:0.2.3
 
 # Convenience variable
 ARG CONDA_ARGS="--quiet --no-update-deps --yes"

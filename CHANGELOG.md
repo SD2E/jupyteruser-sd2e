@@ -2,6 +2,14 @@
 
 All notable changes to this project are to be documented in this file.
 
+## Version 0.3.4
+
+- Base now getting Ubuntu xenial security updates
+- Updated SD2E CLI to latest (1.2.1)
+- Image rebuild updates jupyter notebook, conda base versions
+- README updated
+  - converted to .ipynb for better readabilty in notebook environment
+
 ## Version 0.3.3
 
  - Added hub https://github.com/github/hub
