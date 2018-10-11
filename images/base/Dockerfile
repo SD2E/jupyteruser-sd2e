@@ -1,5 +1,5 @@
 #Image: sd2e/jupyteruser-base
-#Version: 0.2.3
+#Version: 0.2.4
 
 FROM ubuntu:xenial
 LABEL maintainer="Greg Zynda <gzynda@tacc.utexas.edu>"
@@ -36,7 +36,7 @@ USER root
 # - Install *-nox (non-GUI) versions of tools when available
 RUN apt-get update && \
     grep security /etc/apt/sources.list > /etc/apt/security.sources.list && \
-    apt-get upgrade -o Dir::Etc::SourceList=/etc/apt/security.sources.list && \
+    apt-get upgrade -yq -o Dir::Etc::SourceList=/etc/apt/security.sources.list && \
     apt-get install -yq --no-install-recommends \
         bzip2 unzip ca-certificates build-essential \
         emacs-nox vim-nox git wget openssh-client curl \
@@ -147,6 +147,7 @@ RUN mkdir $CONDA_DIR && chmod -R a+rX $CONDA_DIR && \
 # Add packages to python3 environment
 ## installing r-essentials without r-base breaks gcc
 RUN conda install --yes --no-update-deps -c defaults -c conda-forge \
+    libiconv \
     jupyter \
     'numpy=1.14*' \
     'scipy=1.0*' \
