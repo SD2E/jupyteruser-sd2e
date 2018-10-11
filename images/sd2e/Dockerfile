@@ -1,7 +1,7 @@
 #Image: sd2e/jupyteruser-sd2e
-#Version: 0.3.4
+#Version: 0.3.5
 
-FROM sd2e/jupyteruser-base:0.2.3
+FROM sd2e/jupyteruser-base:0.2.4
 
 # Convenience variable
 ARG CONDA_ARGS="--quiet --no-update-deps --yes"
@@ -133,7 +133,7 @@ ENV MKL_THREADING_LAYER=GNU
 ###############################################
 # Install Jupyterlab
 ###############################################
-RUN conda install -c conda-forge jupyterlab && \
+RUN conda install -c conda-forge 'jupyterlab=0.34.12' && \
     jupyter labextension install @jupyterlab/hub-extension && \
     docker-clean
 
