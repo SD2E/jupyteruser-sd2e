@@ -1,5 +1,5 @@
 #Image: sd2e/jupyteruser-sd2e
-#Version: 0.3.5
+#Version: 0.3.6
 
 FROM sd2e/jupyteruser-base:0.2.4
 
@@ -33,7 +33,7 @@ LABEL "comment"="Support for Open Probabilistic Programming Stack" "issue"="SD2E
 # Install run dependencies
 RUN apt-get update && apt-get install -yq --no-install-recommends libgsl0-dev && \
 	conda install -n python2 ${CONDA_ARGS} flask jsonschema patsy requests six && \
-	conda install -n python2 ${CONDA_ARGS} -c conda-forge apsw && \
+	conda install -n python2 ${CONDA_ARGS} -c conda-forge ncurses apsw && \
 	docker-clean
 # Install probcomp software stack
 ### Make sure to remove build deps
