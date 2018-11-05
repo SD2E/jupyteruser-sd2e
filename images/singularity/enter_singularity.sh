@@ -22,6 +22,17 @@ if [ -n "$STOCKYARD" ]; then
 	cd $STOCKYARD/jupyter
 fi
 
+# Create work and project data symlinks if they don't exist in $STOCKYARD/jupyter
+if [ ! -e "$STOCKYARD/jupyter/tacc-work" ]; then
+	echo "Creating symlink for tacc-work"
+	ln -s ../ $STOCKYARD/jupyter/tacc-work
+fi
+
+if [ ! -e "$STOCKYARD/jupyter/sd2e-community" ]; then
+	echo "Creating symlink for sd2e-community"
+	ln -s /work/projects/SD2E-Community/prod/data/ $STOCKYARD/jupyter/sd2e-community
+fi
+
 # Delete any legacy configs
 if [ -e $HOME/.jupyter ]; then
 	rm -rf $HOME/.jupyter

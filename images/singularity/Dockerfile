@@ -1,7 +1,7 @@
 #Image: sd2e/jupyteruser-singularity
-#Version: 0.1.0
+#Version: 0.1.1
 
-FROM sd2e/jupyteruser-sd2e:0.3.1
+FROM sd2e/jupyteruser-sd2e:0.3.6
 
 # Image release
 USER root
@@ -16,7 +16,7 @@ RUN [ ! -e $SD2E_DIR ] && mkdir -p $SD2E_HOME && \
 ##########################################
 # Archive HOME
 ##########################################
-cp -r examples SD2E_README.md $SD2E_HOME/ && \
+cp -r examples SD2E_README.ipynb $SD2E_HOME/ && \
 #cp -r .cache $SD2E_HOME/ && \
 tar -czf $SD2E_DIR/home_archive.tar.gz -C $SD2E_DIR jupyter && \
 chmod 644 $SD2E_DIR/home_archive.tar.gz && \
@@ -37,14 +37,21 @@ COPY enter_singularity.sh /bin/enter_singularity.sh
 RUN chmod 755 /bin/enter_singularity.sh
 #ENTRYPOINT ["/bin/bash"]
 #CMD ["/bin/enter_singularity.sh"]
+ENTRYPOINT ["tini", "--", "/bin/enter_singularity.sh"]
 ##########################################
 # Clean up ENV
 ##########################################
 ENV NB_USER=
 ENV NB_UID=
 ENV NB_GID=
-#ENV HOME=
-#ENV USER=
+ENV NB_GROUP=
+ENV USER=
+ENV HOME='$STOCKYARD/jupyter'
+ENV PYTHONUSERBASE='$STOCKYARD/jupyter_packages'
+ENV JUPYTER_PATH='$STOCKYARD/jupyter_packages/share/jupyter:'
+ENV JUPYTER_WORK='$STOCKYARD/jupyter_packages'
+ENV LOCAL_ENVS='$STOCKYARD/jupyter_packages/envs'
+ENV CONDA_ENVS_PATH='$STOCKYARD/jupyter_packages/envs:'
 #ENV XDG_CACHE_HOME=
 #ENV WORK=
 
