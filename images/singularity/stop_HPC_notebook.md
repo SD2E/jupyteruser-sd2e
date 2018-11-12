@@ -8,7 +8,7 @@ Assuming you have have an HPC notebook running, you can stop it through agave as
 
 ## Request "More Info" about your job
 
-![more info](https://user-images.githubusercontent.com/6790115/48360724-73948a00-e665-11e8-92d6-1d8e5d8ac4ed.png)
+![more info](https://user-images.githubusercontent.com/6790115/48362075-747aeb00-e668-11e8-84c0-b4fa2b07c637.png)
 
 ## Stop your job
 
