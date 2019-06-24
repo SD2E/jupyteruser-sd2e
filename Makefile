@@ -18,7 +18,8 @@ help:
 	echo "Targets:" && \
 	echo " - base - Recipe in images/base" && \
 	echo " - sd2e - Recipe in images/sd2e which is where all community software should belong" && \
-	echo " - singularity - Image for running on TACC HPC\n"
+	echo " - singularity - Image for running on TACC HPC" && \
+	echo " - ml - Image for running ML on TACC HPC\n"
 
 # Make sure image targets are not used as make targets
 %:
@@ -43,6 +44,9 @@ build: docker
 	singularity) \
 		build/build_jupyteruser.sh build images/singularity; \
 		;; \
+	ml) \
+		build/build_jupyteruser.sh build images/ml; \
+		;; \
 	*) \
 		$(MAKE) help; \
 		;; \
@@ -59,6 +63,9 @@ test: docker
 		;; \
 	singularity) \
 		build/build_jupyteruser.sh test images/singularity; \
+		;; \
+	ml) \
+		build/build_jupyteruser.sh test images/ml; \
 		;; \
 	*) \
 		$(MAKE) help; \
@@ -77,6 +84,9 @@ stage: docker
 	singularity) \
 		build/build_jupyteruser.sh stage images/singularity; \
 		;; \
+	ml) \
+		build/build_jupyteruser.sh stage images/ml; \
+		;; \
 	*) \
 		$(MAKE) help; \
 		;; \
@@ -94,6 +104,9 @@ release: docker
 	singularity) \
 		build/build_jupyteruser.sh release images/singularity; \
 		;; \
+	ml) \
+		build/build_jupyteruser.sh release images/ml; \
+		;; \
 	*) \
 		$(MAKE) help; \
 		;; \
@@ -101,6 +114,7 @@ release: docker
 
 clean: docker
 	TARGET=$(filter-out $@,$(MAKECMDGOALS)) && \
+	build/build_jupyteruser.sh clean images/ml && \
 	build/build_jupyteruser.sh clean images/singularity && \
 	build/build_jupyteruser.sh clean images/sd2e && \
 	build/build_jupyteruser.sh clean images/base
