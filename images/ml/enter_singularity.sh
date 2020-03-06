@@ -34,15 +34,30 @@ if [ -n "$STOCKYARD" ]; then
 	fi
 else
 	echo "No \$STOCKYARD detected - Not unpacking example notebooks or creating data symlinks"
+	export STOCKYARD=${SCRATCH:=${HOME}}
+
+	# Work is defined
+	if [ ! -e $STOCKYARD/jupyter ]; then
+		mkdir -p $STOCKYARD/jupyter
+	fi
+
+	# Change to jupyter directory if it exists
+	echo "Changing to SD2E notebook directory"
+	cd $STOCKYARD/jupyter
 fi
+
+export HOME=$STOCKYARD/jupyter
 
 # Unpack jupyter config
 #[ ! -e $HOME/.jupyter ] && tar -xzf /usr/share/sd2e/dotjupyter.tar.gz -C $HOME
 
 # Delete any legacy configs
-if [ -e $HOME/.jupyter ]; then
-	rm -rf $HOME/.jupyter
-fi
+for dir in ~/.jupyter ${HOME}/.jupyter; do
+	echo $dir
+	if [ -e $dir ]; then rm -rf $dir; fi
+done
+
+echo $STOCKYARD
 
 # Start the notebook
 start-notebook.sh

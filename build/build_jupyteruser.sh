@@ -3,11 +3,11 @@
 function getTags {
 	# Returns the list of tags associated with a dockerhub image
 	image=$1
-	wget -q https://registry.hub.docker.com/v2/repositories/${image}/tags -O - | python -c '''
+	curl -s https://registry.hub.docker.com/v2/repositories/${image}/tags | python -c '''
 import sys, json
 JS = json.load(sys.stdin)["results"]
-for record in JS: print record["name"]
-''' 2>/dev/null
+for record in JS: print(record["name"])
+'''
 }
 function containsTag {
 	# 0 if image contaisn the tag 1 if not
@@ -58,13 +58,11 @@ function prevInfo {
 	fi
 }
 
-function buildImage {
-	# Builds an image
-	fileExists $1/Dockerfile
-	cd $1
-	IMG=$(getVal Image:)
-	VERSION=$(getVal Version:)
-	DEP=$(getVal FROM)
+function buildImageVersion {
+	DEP=$1
+	IMG=$2
+	VERSION=$3
+	EXTRA=" ${4:=}"
 	if [ -z "$(docker images -q $DEP)" ] && ! containsTag ${DEP%%:*} ${DEP##*:}; then
 		ee "Could not find $DEP locally or on dockerhub. Please build it to build ${1}"
 	fi
@@ -78,9 +76,25 @@ function buildImage {
 	fi
 	ed "Building ${IMG}:${VERSION}"
 	prevInfo $IMG
-	ed "docker build --build-arg image_version=${VERSION} -t $IMG:${VERSION} ."
-	! docker build --build-arg image_version=${VERSION} -t $IMG:${VERSION} . && ee "Failed to build $IMG:$VERSION"
+	ed "docker build --build-arg image_version=${VERSION}$EXTRA -t $IMG:${VERSION} ."
+	! docker build --build-arg image_version=${VERSION}$EXTRA -t $IMG:${VERSION} . && ee "Failed to build $IMG:$VERSION"
 	ed "Finished ${IMG}:${VERSION}"
+}
+
+function buildImage {
+	# Builds an image
+	fileExists $1/Dockerfile
+	cd $1
+	IMG=$(getVal Image:)
+	if [ "$1" == "images/ml" ]; then
+		getTags "tacc/tacc-ml" | while read tag; do
+			buildImageVersion "tacc/tacc-ml:$tag" sd2e/tacc-ml-jupyter $tag "--build-arg TAG=$tag"
+		done
+	else
+		VERSION=$(getVal Version:)
+		DEP=$(getVal FROM)
+		buildImageVersion $DEP $IMG $VERSION
+	fi
 }
 
 function testImage {

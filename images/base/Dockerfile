@@ -136,6 +136,7 @@ RUN mkdir $CONDA_DIR && chmod -R a+rX $CONDA_DIR && \
     rm Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh && \
     conda config --system --set auto_update_conda false && \
     conda config --system --set show_channel_urls true && \
+    conda config --system --set default_threads 4 && \
     conda update -n base conda && \
     conda update --all --quiet --yes && \
     rm -rf ${CONDA_DIR}/pkgs/* && \

@@ -1,7 +1,9 @@
-#Image: sd2e/jupyteruser-ml-singularity
+#Image: sd2e/tacc-ml-jupyter
 #Version: 0.0.1
 
-FROM gzynda/tacc-maverick-ml:latest
+ARG TAG
+FROM tacc/tacc-ml:${TAG}
+ARG TAG
 
 # Image release
 USER root
@@ -28,30 +30,36 @@ ENV NB_USER=jupyter \
     NB_GID=${TACC_GID} \
     NB_GROUP=${TACC_GID} \
     SHELL=/bin/bash
-RUN groupadd --gid 816877 ${AGAVE_GID} && \
-    useradd --uid 458981 --gid ${AGAVE_GID} -m --home /home/jupyter --shell /bin/bash $NB_USER && \
-    groupadd --gid ${NB_GID} ${NB_GROUP} && \
-    usermod -a -G ${NB_GROUP} jupyter
+RUN groupadd --gid 816877 ${AGAVE_GID}
+RUN useradd --uid 458981 --gid ${AGAVE_GID} -m --home /home/jupyter --shell /bin/bash $NB_USER
+RUN groupadd --gid ${NB_GID} tacc-group
+RUN usermod -a -G ${NB_GROUP} jupyter
 # While not ideal, this is required since the users that are injected
 # into the container do not exist.
 ENV HOME=/home/jupyter \
-    USER=jupyter \
-    LC_ALL=en_US.UTF-8 \
-    LANG=en_US.UTF-8 \
-    LANGUAGE=en_US.UTF-8
+    USER=jupyter
+#    LC_ALL=en_US.UTF-8 \
+#    LANG=en_US.UTF-8 \
+#    LANGUAGE=en_US.UTF-8
 # Make primary group TACC_GID
 RUN usermod -g ${NB_GROUP} jupyter
 
+###################################################################
 # Add jupyter helper scripts
+###################################################################
 ARG BURL=https://raw.githubusercontent.com/jupyter/docker-stacks/master/base-notebook
-RUN bash -c "cd /usr/local/bin && for target in fix-permissions start{\"\",-notebook,-singleuser}.sh; do wget -q ${BURL}/\$target && chmod a+rx \$target; done" && \
-mkdir /etc/jupyter && cd /etc/jupyter && wget -q ${BURL}/jupyter_notebook_config.py && \
-fix-permissions /etc/jupyter /usr/local/bin
+RUN cd /usr/local/bin \
+	&& for target in fix-permissions start{,-notebook,-singleuser}.sh; do \
+		curl -sL ${BURL}/$target > $target \
+		&& chmod a+rx $target; \
+	done
+RUN mkdir /etc/jupyter && cd /etc/jupyter && curl -sL ${BURL}/jupyter_notebook_config.py > jupyter_notebook_config.py && \
+chmod -R a+rX /etc/jupyter /usr/local/bin
 
 ##########################################
 # Modify default config
 ##########################################
-RUN echo "\n\n# Set a password if PASSWORD is set\n\
+RUN echo -e "\n\n# Set a password if PASSWORD is set\n\
 if 'PASSWORD' in os.environ:\n\
 \tfrom IPython.lib import passwd\n\
 \tc.NotebookApp.password = passwd(os.environ['PASSWORD'])\n\
@@ -63,9 +71,10 @@ c.NotebookApp.iopub_data_rate_limit=10000000" >> /etc/jupyter/jupyter_notebook_c
 COPY enter_singularity.sh /bin/enter_singularity.sh
 RUN chmod 755 /bin/enter_singularity.sh
 #ENTRYPOINT ["/bin/bash"]
-#CMD ["/bin/enter_singularity.sh"]
-ENTRYPOINT ["tini", "--", "/bin/enter_singularity.sh"]
-CMD []
+CMD ["/bin/enter_singularity.sh"]
+#CMD ["jupyter","notebook"]
+#ENTRYPOINT ["/bin/enter_singularity.sh"]
+#CMD []
 
 EXPOSE 8888
 ##########################################
@@ -76,7 +85,8 @@ ENV NB_UID=
 ENV NB_GID=
 ENV NB_GROUP=
 ENV USER=
-ENV HOME='$STOCKYARD/jupyter'
+ENV HOME=
+#'$STOCKYARD/jupyter'
 ENV PYTHONUSERBASE='$STOCKYARD/jupyter_packages'
 ENV JUPYTER_PATH='$STOCKYARD/jupyter_packages/share/jupyter:'
 ENV JUPYTER_WORK='$STOCKYARD/jupyter_packages'
