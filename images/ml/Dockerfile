@@ -92,6 +92,7 @@ ENV JUPYTER_PATH='$STOCKYARD/jupyter_packages/share/jupyter:'
 ENV JUPYTER_WORK='$STOCKYARD/jupyter_packages'
 ENV LOCAL_ENVS='$STOCKYARD/jupyter_packages/envs'
 ENV CONDA_ENVS_PATH='$STOCKYARD/jupyter_packages/envs:'
+ENV CONDA_PKGS_DIRS='$STOCKYARD/jupyter_packages/pkgs'
 #ENV XDG_CACHE_HOME=
 #ENV WORK=
 
