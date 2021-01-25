@@ -32,6 +32,14 @@ if [ -n "$STOCKYARD" ]; then
 		echo "Creating symlink for sd2e-partners"
 		ln -s /work/projects/DARPA-SD2-Partners $STOCKYARD/jupyter/sd2e-partners
 	fi
+
+	# Update environment variables based on STOCKYARD, temp hack 1/22/2021
+	export PYTHONUSERBASE="$STOCKYARD/jupyter_packages"
+	export JUPYTER_PATH="$STOCKYARD/jupyter_packages/share/jupyter:"
+	export JUPYTER_WORK="$STOCKYARD/jupyter_packages"
+	export LOCAL_ENVS="$STOCKYARD/jupyter_packages/envs"
+	export CONDA_ENVS_PATH="$STOCKYARD/jupyter_packages/envs:"
+	export CONDA_PKGS_DIRS="$STOCKYARD/jupyter_packages/pkgs"
 else
 	echo "No \$STOCKYARD detected - Not unpacking example notebooks or creating data symlinks"
 	export STOCKYARD=${SCRATCH:=${HOME}}
