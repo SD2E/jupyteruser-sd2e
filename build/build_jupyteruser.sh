@@ -62,7 +62,7 @@ function buildImageVersion {
 	DEP=$1
 	IMG=$2
 	VERSION=$3
-	EXTRA=" ${4:=}"
+	EXTRA=" ${4:-}"
 	if [ -z "$(docker images -q $DEP)" ] && ! containsTag ${DEP%%:*} ${DEP##*:}; then
 		ee "Could not find $DEP locally or on dockerhub. Please build it to build ${1}"
 	fi
