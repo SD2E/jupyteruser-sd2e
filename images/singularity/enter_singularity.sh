@@ -85,4 +85,4 @@ done
 echo $STOCKYARD2
 
 # Start the notebook
-start-notebook.sh
+start-notebook.sh "$@"

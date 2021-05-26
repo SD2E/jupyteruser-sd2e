@@ -1,5 +1,5 @@
 #Image: sd2e/jupyteruser-singularity
-#Version: 0.1.5
+#Version: 0.1.6
 
 FROM sd2e/jupyteruser-sd2e:0.3.8
 
