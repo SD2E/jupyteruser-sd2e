@@ -86,5 +86,5 @@ echo $STOCKYARD2
 
 # Start the notebook
 #start-notebook.sh "$@"
-echo "Running ${CONDA_DIR/bin/jupyter-notebook $@"
+echo "Running ${CONDA_DIR}/bin/jupyter-notebook $@"
 ${CONDA_DIR}/bin/jupyter-notebook "$@"
