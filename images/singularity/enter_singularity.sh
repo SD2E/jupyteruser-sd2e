@@ -77,12 +77,14 @@ export HOME=$STOCKYARD2/jupyter
 #[ ! -e $HOME/.jupyter ] && tar -xzf /usr/share/sd2e/dotjupyter.tar.gz -C $HOME
 
 # Delete any legacy configs
-for dir in ~/.jupyter ${HOME}/.jupyter; do
-	echo $dir
-	if [ -e $dir ]; then rm -rf $dir; fi
-done
+#for dir in ~/.jupyter ${HOME}/.jupyter; do
+#	echo $dir
+#	if [ -e $dir ]; then rm -rf $dir; fi
+#done
 
 echo $STOCKYARD2
 
 # Start the notebook
-start-notebook.sh "$@"
+#start-notebook.sh "$@"
+echo "Running ${CONDA_DIR/bin/jupyter-notebook $@"
+${CONDA_DIR}/bin/jupyter-notebook "$@"

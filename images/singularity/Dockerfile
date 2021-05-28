@@ -1,5 +1,5 @@
 #Image: sd2e/jupyteruser-singularity
-#Version: 0.1.6
+#Version: 0.1.8
 
 FROM sd2e/jupyteruser-sd2e:0.3.8
 
@@ -46,13 +46,13 @@ ENV NB_UID=
 ENV NB_GID=
 ENV NB_GROUP=
 ENV USER=
-ENV HOME='$STOCKYARD2/jupyter'
-ENV PYTHONUSERBASE='$STOCKYARD2/jupyter_packages'
-ENV JUPYTER_PATH='$STOCKYARD2/jupyter_packages/share/jupyter:'
-ENV JUPYTER_WORK='$STOCKYARD2/jupyter_packages'
-ENV LOCAL_ENVS='$STOCKYARD2/jupyter_packages/envs'
-ENV CONDA_ENVS_PATH='$STOCKYARD2/jupyter_packages/envs:'
-ENV CONDA_PKGS_DIRS='$STOCKYARD2/jupyter_packages/pkgs'
+#ENV HOME='$STOCKYARD2/jupyter'
+#ENV PYTHONUSERBASE='$STOCKYARD2/jupyter_packages'
+#ENV JUPYTER_PATH='$STOCKYARD2/jupyter_packages/share/jupyter:'
+#ENV JUPYTER_WORK='$STOCKYARD2/jupyter_packages'
+#ENV LOCAL_ENVS='$STOCKYARD2/jupyter_packages/envs'
+#ENV CONDA_ENVS_PATH='$STOCKYARD2/jupyter_packages/envs:'
+#ENV CONDA_PKGS_DIRS='$STOCKYARD2/jupyter_packages/pkgs'
 #ENV XDG_CACHE_HOME=
 #ENV WORK=
 
